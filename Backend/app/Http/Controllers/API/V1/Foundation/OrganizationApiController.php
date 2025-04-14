@@ -20,7 +20,7 @@ class OrganizationApiController extends Controller
      * List Organization.
      *
      * List all organization.
-     * 
+     *
      */
     public function index(Request $request, OrganizationService $organizationService)
     {
@@ -59,7 +59,7 @@ class OrganizationApiController extends Controller
 
         /**
          * @status 200
-         * 
+         *
          * @body array{status: string, code: int, message: string, data: OrganizationResource}
          */
         return $this->successResponse(data: OrganizationResource::make($organization), message: 'Success create organization');
@@ -67,7 +67,7 @@ class OrganizationApiController extends Controller
 
     /**
      * Update an organization
-     * 
+     *
      */
     public function update(UpdateOrganizationRequest $request, string $id, OrganizationService $organizationService)
     {
@@ -77,7 +77,7 @@ class OrganizationApiController extends Controller
 
             /**
              * @status 404
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('organization not found', Response::HTTP_NOT_FOUND);
@@ -94,7 +94,7 @@ class OrganizationApiController extends Controller
 
     /**
      * Organization Permission
-     * 
+     *
      * Get all available permission from an organization
      */
     public function permissions(Request $request, OrganizationService $organizationService)
@@ -107,7 +107,7 @@ class OrganizationApiController extends Controller
 
         /**
          * @status 200
-         * 
+         *
          * @body array{status: string, code: int, data: PermissionResource[], count: int}
          */
         return $this->successResponse(data: $permissions, optionalResponses: ['count' => $count]);
@@ -123,7 +123,7 @@ class OrganizationApiController extends Controller
         if ($organization == null) {
             /**
              * Organization not found
-             * 
+             *
              * @status 404
              * @body ErrorResource
              */
@@ -132,7 +132,7 @@ class OrganizationApiController extends Controller
 
         /**
          * @status 200
-         * 
+         *
          * @body array{status: string, code: int, data: OrganizationResource}
          */
         return $this->successResponse(data: OrganizationResource::make($organization));
@@ -153,10 +153,10 @@ class OrganizationApiController extends Controller
             return $this->errorResponse('organization not found', Response::HTTP_NOT_FOUND);
         }
 
-        if ($organization->domain == 'rootdigitaltechnology.com') {
+        if ($organization->domain == 'mitrasaburaiproperti.com') {
             /**
              * @status 400
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('organization cannot be deleted', Response::HTTP_BAD_REQUEST);

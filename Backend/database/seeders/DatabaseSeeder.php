@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
 
             $rdtOrganization = Organization::query()
                 ->create([
-                    'name' => 'Root Digital Technology',
-                    'domain' => 'rootdigitaltechnology.com',
+                    'name' => 'Mitra Saburai Properti',
+                    'domain' => 'mitrasaburaiproperti.com',
                     'address' => '',
                     'cut_off_timesheet_start_day' => 28,
                     'cut_off_timesheet_end_day' => 27,
@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
 
             foreach ($users as $key => $user) {
                 $newUser = User::create(collect($user)->only(['first_name', 'last_name'])->toArray() + [
-                    'email' => formatNameToInitials($user['first_name'], $user['last_name']) . '@rootdigitaltechnology.com',
+                    'email' => formatNameToInitials($user['first_name'], $user['last_name']) . '@mitrasaburaiproperti.com',
                     'password' => Hash::make('password'),
                     'organization_id' => $rdtOrganization->id,
                     'is_admin_organization' => true,
@@ -148,7 +148,7 @@ class DatabaseSeeder extends Seeder
     {
         foreach ($user['subordinates'] as $sub) {
             $subOrdinate = User::create(collect($sub)->only(['first_name', 'last_name'])->toArray() + [
-                'email' => formatNameToInitials($sub['first_name'], $sub['last_name']) . '@rootdigitaltechnology.com',
+                'email' => formatNameToInitials($sub['first_name'], $sub['last_name']) . '@mitrasaburaiproperti.com',
                 'password' => Hash::make('password'),
                 'organization_id' => $orgId,
                 'is_admin_organization' => true,

@@ -11,9 +11,9 @@ class OrganizationResource extends JsonResource
     {
         return [
             'id' => collect($this->resource)->get('id'),
-            /** @example Root Digital Technology */
+            /** @example Mitra Saburai Properti */
             'name' => collect($this->resource)->get('name'),
-            /** @example rootdigitaltechnology.com */
+            /** @example mitrasaburaiproperti.com */
             'domain' => collect($this->resource)->get('domain'),
             /** @example Asia/Jakarta */
             'timezone' => collect($this->resource)->get('timezone'),
@@ -24,8 +24,8 @@ class OrganizationResource extends JsonResource
             'work_start_at' => collect($this->resource)->get('work_start_at'),
             /** @format custom_datetime */
             'work_end_at' => collect($this->resource)->get('work_end_at'),
-            /** 
-             * @var int|null 
+            /**
+             * @var int|null
              * */
             'cut_off_timesheet_start_day' => collect($this->resource)->get('cut_off_timesheet_start_day'),
             /** @var int|null */
@@ -35,7 +35,7 @@ class OrganizationResource extends JsonResource
 
             $this->mergeWhen(collect($this->resource)?->get('created_by') != null, [
                 /**
-                 * @example admin 
+                 * @example admin
                  * */
                 'created_by' => collect($this->resource)?->get('created_by'),
             ]),

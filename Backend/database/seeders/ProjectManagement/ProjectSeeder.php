@@ -17,7 +17,7 @@ class ProjectSeeder extends Seeder
         $clients = [
             [
                 'name' => 'Artha',
-                'organization_id' => DB::table('organizations')->select('id')->where('domain', 'rootdigitaltechnology.com')->value('id'),
+                'organization_id' => DB::table('organizations')->select('id')->where('domain', operator: 'mitrasaburaiproperti.com')->value('id'),
                 'created_by' => DB::table('users')->select('id')->where('first_name', 'Deo')->value('id'),
                 'projects' => [
                     [

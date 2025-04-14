@@ -28,9 +28,9 @@ class AuthenticationApiController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            /** 
-             * @default muhammad.ikhbal@rootdigitaltechnology.com 
-             * @example muhammad.ikhbal@rootdigitaltechnology.com 
+            /**
+             * @default muhammad.ikhbal@mitrasaburaiproperti.com
+             * @example muhammad.ikhbal@mitrasaburaiproperti.com
              * */
             'email' => ['required', 'email'],
             /** @default password */
@@ -44,7 +44,7 @@ class AuthenticationApiController extends Controller
         if ($user == null) {
             /**
              * @status 401
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse(__('The credentials provided does not match with our record.'), Response::HTTP_UNAUTHORIZED);
@@ -60,7 +60,7 @@ class AuthenticationApiController extends Controller
         if (!Hash::check($request->password, $user->password)) {
             /**
              * @status 401
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse(__('The credentials provided does not match with our record.'), Response::HTTP_UNAUTHORIZED);
@@ -116,7 +116,7 @@ class AuthenticationApiController extends Controller
 
         /**
          * @status 200
-         * 
+         *
          * @body array{data: array{user: LoginResource, token: string, refresh_token: string}, code: int, status: string}
          */
         return $this->successResponse(data: ['user' => LoginResource::make($user), 'token' => $token, 'refresh_token' => $refreshToken]);
@@ -141,7 +141,7 @@ class AuthenticationApiController extends Controller
             /**
              * Expired token
              * @status 403
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('Authentication token has expired or is not yet valid.', Response::HTTP_FORBIDDEN);
@@ -149,7 +149,7 @@ class AuthenticationApiController extends Controller
             /**
              * Invalid token
              * @status 400
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('Invalid token', Response::HTTP_BAD_REQUEST);
@@ -165,7 +165,7 @@ class AuthenticationApiController extends Controller
             /**
              * User not found
              * @status 404
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('User not found', Response::HTTP_NOT_FOUND);
@@ -218,7 +218,7 @@ class AuthenticationApiController extends Controller
         /**
          * Success refresh token
          * @status 200
-         * 
+         *
          * @body array{data: array{user: LoginResource, token: string, refresh_token: string}, code: int, status: string}
          */
         return $this->successResponse(data: ['user' => LoginResource::make($user), 'token' => $token, 'refresh_token' => $refreshToken]);
@@ -238,7 +238,7 @@ class AuthenticationApiController extends Controller
             /**
              * Invalid credential
              * @status 401
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('Invalid credential', Response::HTTP_UNAUTHORIZED);
@@ -252,7 +252,7 @@ class AuthenticationApiController extends Controller
             /**
              * User not found
              * @status 404
-             * 
+             *
              * @body ErrorResource
              */
             return $this->errorResponse('User not found', Response::HTTP_NOT_FOUND);
@@ -298,7 +298,7 @@ class AuthenticationApiController extends Controller
         /**
          * Success refresh token
          * @status 200
-         * 
+         *
          * @body array{data: array{user: LoginResource, token: string, refresh_token: string}, code: int, status: string}
          */
         return $this->successResponse(data: ['user' => LoginResource::make($user), 'token' => $token, 'refresh_token' => $refreshToken]);

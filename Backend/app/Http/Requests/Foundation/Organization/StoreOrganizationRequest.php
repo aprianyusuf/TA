@@ -16,7 +16,7 @@ class StoreOrganizationRequest extends FormRequest
         return [
             /** @example string */
             'name' => ['required'],
-            /** @example rootdigitaltechnology.com */
+            /** @example mitrasaburaiproperti.com */
             'domain' => ['required', 'regex:/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/i'],
             /** @example Asia/Jakarta */
             'timezone' => ['required', 'timezone:all'],
