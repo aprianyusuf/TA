@@ -15,6 +15,18 @@ class LeaveRequestService
         //
     }
 
+    public function getLeaveRequest($request)
+    {
+        // Implement the logic to retrieve leave requests based on the request parameters.
+        // This is a placeholder for the actual implementation.
+        return LeaveRequest::query()->with(
+            [
+                'user',
+                'leaveType',
+            ]
+        )->get();
+    }
+
     /**
      * Calculate period boundaries based on a given date and period type.
      *
@@ -48,7 +60,7 @@ class LeaveRequestService
                     'end'   => $date->copy()->endOfQuarter(),
                 ];
             case 'half_year':
-                // Assuming first half: Jan-Jun, second: Jul-Dec
+                // First half: Jan-Jun, second: Jul-Dec
                 if ((int) $date->format('n') <= 6) {
                     return [
                         'start' => Carbon::createFromDate($date->year, 1, 1),
@@ -75,7 +87,7 @@ class LeaveRequestService
      */
     protected function getUsedLeaveDays(string $userId, string $leaveTypeId, Carbon $startDate, Carbon $endDate): int
     {
-        // Only count approved leave requests (assuming status 1 is approved)
+        // Only count approved leave requests (status 1 is approved)
         return (int) LeaveRequest::where('user_id', $userId)
             ->where('leave_type_id', $leaveTypeId)
             ->where('status', 1)
