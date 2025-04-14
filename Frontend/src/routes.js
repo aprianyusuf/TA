@@ -3,31 +3,31 @@ import { lazy } from "react";
 import ClockInOut from "./pages/Leave/ClockInOut/ClockInOut";
 
 export const ROUTE_MASTER = [
-	{
-		Component: lazy(() => import("@/pages/Master/Organization/Organization")),
-		path: "organization",
-		menu: "SYS00001",
-		isLazy: true,
-		title: "Organization",
-		fullPath: "/master/organization",
-		isNavbar: true,
-	},
-	{
-		Component: lazy(
-			() => import("@/pages/Master/Organization/AddOrganization"),
-		),
-		path: "organization/add",
-		menu: "SYS00003",
-		isLazy: true,
-	},
-	{
-		Component: lazy(
-			() => import("@/pages/Master/Organization/EditOrganization"),
-		),
-		path: "organization/edit/:id",
-		menu: "SYS00004",
-		isLazy: true,
-	},
+	// {
+	// 	Component: lazy(() => import("@/pages/Master/Organization/Organization")),
+	// 	path: "organization",
+	// 	menu: "SYS00001",
+	// 	isLazy: true,
+	// 	title: "Organization",
+	// 	fullPath: "/master/organization",
+	// 	isNavbar: true,
+	// },
+	// {
+	// 	Component: lazy(
+	// 		() => import("@/pages/Master/Organization/AddOrganization"),
+	// 	),
+	// 	path: "organization/add",
+	// 	menu: "SYS00003",
+	// 	isLazy: true,
+	// },
+	// {
+	// 	Component: lazy(
+	// 		() => import("@/pages/Master/Organization/EditOrganization"),
+	// 	),
+	// 	path: "organization/edit/:id",
+	// 	menu: "SYS00004",
+	// 	isLazy: true,
+	// },
 	{
 		Component: lazy(() => import("@/pages/Master/Position/Position")),
 		path: "position",
