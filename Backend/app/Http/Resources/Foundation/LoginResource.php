@@ -21,6 +21,12 @@ class LoginResource extends JsonResource
                 'name' => $this->organization->name,
                 'domain' => $this->organization->domain,
             ],
+            'position' => [
+                'id' => $this->position->id,
+                'name' => $this->position->name,
+                'organization_id' => $this->position->organization_id,
+                'position_id' => $this->position->position_id,
+            ],
         ];
     }
 }
