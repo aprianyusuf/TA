@@ -20,7 +20,7 @@ class LeaveRequestService
     public function getLeaveRequest(Request $request)
     {
         $user = $request->decoded;
-        // dd($user['organization']['id']);
+        // dd($user['name']);
         $query = LeaveRequest::query()
             ->where('organization_id', $user['organization']['id'])
         ;

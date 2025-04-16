@@ -17,12 +17,12 @@ class LeaveRequestResource extends JsonResource
         return [
             'id'         => $this->id,
             'user'       => [
-                'id'=> $this->id,
-                'name'=> $this->name,
+                'id'   => $this->user->id,
+                'name' => $this->user->first_name . ' ' . $this->user->last_name,
             ],
             'leave_type' => [
                 'id'   => $this->leaveType->id,
-                'name'  => $this->leaveType->name,
+                'name' => $this->leaveType->name,
             ],
             'start_date' => $this->start_date,
             'end_date'   => $this->end_date,
