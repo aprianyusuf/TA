@@ -19,11 +19,11 @@ class LeaveRequestService
 
     public function getLeaveRequest(Request $request)
     {
-        $user  = $request->decoded;
+        $user = $request->decoded;
         // dd($user['organization']['id']);
         $query = LeaveRequest::query()
             ->where('organization_id', $user['organization']['id'])
-            ;
+        ;
 
         if (! in_array($user['position']['name'], ['HR', 'CEO'])) {
             $query->where(function ($q) use ($user) {
@@ -39,6 +39,7 @@ class LeaveRequestService
             ->filter($request->filter)
             ->sort($request->sort)
             ->with(['user', 'leaveType'])
+            ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))->limit($request->get('size', 10))
             ->get();
     }
 

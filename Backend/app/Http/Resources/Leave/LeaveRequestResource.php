@@ -15,9 +15,15 @@ class LeaveRequestResource extends JsonResource
     {
         // Here, you can add custom attributes or modify the data before returning it.
         return [
-            'id'         => $this->id,              // Example: custom field
-            'user'       => $this->user->name,      // Example: if you want to include the user's name instead of user ID
-            'leave_type' => $this->leaveType->type, // If you want the leave type name instead of ID
+            'id'         => $this->id,
+            'user'       => [
+                'id'=> $this->user->id,
+                ''=> $this->user->name,
+            ],
+            'leave_type' => [
+                'id'   => $this->leaveType->id,
+                'name'  => $this->leaveType->name,
+            ],
             'start_date' => $this->start_date,
             'end_date'   => $this->end_date,
             'status'     => $this->status,

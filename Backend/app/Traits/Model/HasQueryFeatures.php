@@ -51,7 +51,7 @@ trait HasQueryFeatures
     }
 }
 
-    public function scopePaginateResults($query, $perPage = 15)
+    public function scopePaginateResults($query, $perPage = 10)
     {
         return $query->paginate($perPage);
     }
