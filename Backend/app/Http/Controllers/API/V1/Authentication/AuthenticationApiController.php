@@ -1,22 +1,21 @@
 <?php
-
 namespace App\Http\Controllers\API\V1\Authentication;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Foundation\ErrorResource;
 use App\Http\Resources\Foundation\LoginResource;
 use App\Models\User;
 use App\Service\AuthService;
+use DateTime;
+use DateTimeZone;
 use Exception;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Resources\Foundation\ErrorResource;
-use DateTime;
-use DateTimeZone;
-use Firebase\JWT\ExpiredException;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticationApiController extends Controller
@@ -32,7 +31,7 @@ class AuthenticationApiController extends Controller
              * @default muhammad.ikhbal@mitrasaburaiproperti.com
              * @example muhammad.ikhbal@mitrasaburaiproperti.com
              * */
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             /** @default password */
             'password' => ['required'],
             /** @default Asia/Jakarta */
@@ -52,12 +51,12 @@ class AuthenticationApiController extends Controller
 
         function customEncrypt($data)
         {
-            $salt = random_bytes(16);
+            $salt      = random_bytes(16);
             $encrypted = openssl_encrypt($salt . $data, config('auth.CRYPTO_ALG'), config('auth.CRYPTO_KEY'), OPENSSL_RAW_DATA, config('auth.CRYPTO_IV_KEY'));
             return base64_encode($salt . $encrypted);
         }
 
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             /**
              * @status 401
              *
@@ -66,7 +65,7 @@ class AuthenticationApiController extends Controller
             return $this->errorResponse(__('The credentials provided does not match with our record.'), Response::HTTP_UNAUTHORIZED);
         }
 
-        $user->load('organization');
+        $user->load('organization', 'position');
 
         $timezone = new DateTimeZone($request->timezone);
         $datetime = new DateTime('now', $timezone);
@@ -74,14 +73,18 @@ class AuthenticationApiController extends Controller
         $offsetInHours = $timezone->getOffset($datetime) / 60 / 60;
 
         $payload = collect([
-            'id' => $user->id,
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'name' => trim("{$user->first_name} {$user->last_name}"),
-            'email' => $user->email,
-            'timezone' => $request->timezone,
+            'id'              => $user->id,
+            'first_name'      => $user->first_name,
+            'last_name'       => $user->last_name,
+            'name'            => trim("{$user->first_name} {$user->last_name}"),
+            'email'           => $user->email,
+            'timezone'        => $request->timezone,
             'timezone_offset' => $offsetInHours,
-            'permission' => DB::table('permission_position as pp')
+            'position'        => collect([
+                'id'   => $user->position->id,
+                'name' => $user->position->name,
+            ]),
+            'permission'      => DB::table('permission_position as pp')
                 ->join('permissions as p', 'pp.permission_id', 'p.id')
                 ->join('users as u', function (JoinClause $join) use ($user) {
                     $join->on('pp.position_id', 'u.position_id')->where('u.id', $user->id);
@@ -90,26 +93,26 @@ class AuthenticationApiController extends Controller
                 ->distinct()
                 ->orderBy('p.code')
                 ->pluck('p.code')
-                // ->transform(fn($v) => customEncrypt($v))
+            // ->transform(fn($v) => customEncrypt($v))
                 ->toArray(),
-            'organization' => collect([
-                'id' => $user->organization->id,
-                'name' => $user->organization->name,
-                'domain' => $user->organization->domain,
-                'timezone' => $user->organization->timezone,
-                'timezone_offset' => (float)$user->organization->timezone_offset,
+            'organization'    => collect([
+                'id'              => $user->organization->id,
+                'name'            => $user->organization->name,
+                'domain'          => $user->organization->domain,
+                'timezone'        => $user->organization->timezone,
+                'timezone_offset' => (float) $user->organization->timezone_offset,
             ]),
         ]);
 
-        $token = (new AuthService)->generateToken(payload: $payload);
+        $token        = (new AuthService)->generateToken(payload: $payload);
         $refreshToken = (new AuthService)->generateToken(payload: $payload->except(['permission', 'organization']), expiredAt: now()->addDays(rand(30, 45)));
 
         if ($user->first_login_at == null) {
             $user->first_login_at = now();
         }
 
-        $user->last_login_at = now();
-        $user->timezone = $request->timezone;
+        $user->last_login_at   = now();
+        $user->timezone        = $request->timezone;
         $user->timezone_offset = $offsetInHours;
 
         $user->save();
@@ -132,7 +135,7 @@ class AuthenticationApiController extends Controller
             /** @default string */
             'refreshToken' => ['required'],
             /** @default Asia/Jakarta */
-            'timezone' => ['required', 'timezone:all'],
+            'timezone'     => ['required', 'timezone:all'],
         ]);
 
         try {
@@ -179,14 +182,14 @@ class AuthenticationApiController extends Controller
         $offsetInHours = $timezone->getOffset($datetime) / 60 / 60;
 
         $payload = collect([
-            'id' => $user->id,
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'name' => trim("{$user->first_name} {$user->last_name}"),
-            'email' => $user->email,
-            'timezone' => $request->timezone,
+            'id'              => $user->id,
+            'first_name'      => $user->first_name,
+            'last_name'       => $user->last_name,
+            'name'            => trim("{$user->first_name} {$user->last_name}"),
+            'email'           => $user->email,
+            'timezone'        => $request->timezone,
             'timezone_offset' => $offsetInHours,
-            'permission' => DB::table('permission_position as pp')
+            'permission'      => DB::table('permission_position as pp')
                 ->join('permissions as p', 'pp.permission_id', 'p.id')
                 ->join('users as u', function (JoinClause $join) use ($user) {
                     $join->on('pp.position_id', 'u.position_id')->where('u.id', $user->id);
@@ -195,22 +198,22 @@ class AuthenticationApiController extends Controller
                 ->distinct()
                 ->orderBy('p.code')
                 ->pluck('p.code')
-                // ->transform(fn($v) => customEncrypt($v))
+            // ->transform(fn($v) => customEncrypt($v))
                 ->toArray(),
-            'organization' => collect([
-                'id' => $user->organization->id,
-                'name' => $user->organization->name,
-                'domain' => $user->organization->domain,
-                'timezone' => $user->organization->timezone,
-                'timezone_offset' => (float)$user->organization->timezone_offset,
+            'organization'    => collect([
+                'id'              => $user->organization->id,
+                'name'            => $user->organization->name,
+                'domain'          => $user->organization->domain,
+                'timezone'        => $user->organization->timezone,
+                'timezone_offset' => (float) $user->organization->timezone_offset,
             ]),
         ]);
 
-        $token = (new AuthService)->generateToken(payload: $payload);
+        $token        = (new AuthService)->generateToken(payload: $payload);
         $refreshToken = (new AuthService)->generateToken(payload: $payload->except(['permission', 'organization']), expiredAt: now()->addDays(rand(30, 60)));
 
-        $user->last_login_at = now();
-        $user->timezone = $request->timezone;
+        $user->last_login_at   = now();
+        $user->timezone        = $request->timezone;
         $user->timezone_offset = $offsetInHours;
 
         $user->save();
@@ -230,8 +233,8 @@ class AuthenticationApiController extends Controller
     public function changeUser(Request $request)
     {
         $request->validate([
-            'id' => ['required'],
-            'password' => ['required']
+            'id'       => ['required'],
+            'password' => ['required'],
         ]);
 
         if ($request->password !== config('app.enable_change_user_password')) {
@@ -261,14 +264,14 @@ class AuthenticationApiController extends Controller
         $user->load('organization');
 
         $payload = collect([
-            'id' => $user->id,
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'name' => trim("{$user->first_name} {$user->last_name}"),
-            'email' => $user->email,
-            'timezone' => $request->timezone,
+            'id'              => $user->id,
+            'first_name'      => $user->first_name,
+            'last_name'       => $user->last_name,
+            'name'            => trim("{$user->first_name} {$user->last_name}"),
+            'email'           => $user->email,
+            'timezone'        => $request->timezone,
             'timezone_offset' => $user->timezone_offset,
-            'permission' => DB::table('permission_position as pp')
+            'permission'      => DB::table('permission_position as pp')
                 ->join('permissions as p', 'pp.permission_id', 'p.id')
                 ->join('users as u', function (JoinClause $join) use ($user) {
                     $join->on('pp.position_id', 'u.position_id')->where('u.id', $user->id);
@@ -277,18 +280,18 @@ class AuthenticationApiController extends Controller
                 ->distinct()
                 ->orderBy('p.code')
                 ->pluck('p.code')
-                // ->transform(fn($v) => customEncrypt($v))
+            // ->transform(fn($v) => customEncrypt($v))
                 ->toArray(),
-            'organization' => collect([
-                'id' => $user->organization->id,
-                'name' => $user->organization->name,
-                'domain' => $user->organization->domain,
-                'timezone' => $user->organization->timezone,
-                'timezone_offset' => (float)$user->organization->timezone_offset,
+            'organization'    => collect([
+                'id'              => $user->organization->id,
+                'name'            => $user->organization->name,
+                'domain'          => $user->organization->domain,
+                'timezone'        => $user->organization->timezone,
+                'timezone_offset' => (float) $user->organization->timezone_offset,
             ]),
         ]);
 
-        $token = (new AuthService)->generateToken(payload: $payload);
+        $token        = (new AuthService)->generateToken(payload: $payload);
         $refreshToken = (new AuthService)->generateToken(payload: $payload->except(['permission', 'organization']), expiredAt: now()->addDays(rand(30, 60)));
 
         $user->last_login_at = now();
