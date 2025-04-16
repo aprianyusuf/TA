@@ -1,33 +1,34 @@
 import { lazy } from "react";
 
 import ClockInOut from "./pages/Leave/ClockInOut/ClockInOut";
+import LeaveRequest from "./pages/Leave/Request/LeaveRequest";
 
 export const ROUTE_MASTER = [
-	// {
-	// 	Component: lazy(() => import("@/pages/Master/Organization/Organization")),
-	// 	path: "organization",
-	// 	menu: "SYS00001",
-	// 	isLazy: true,
-	// 	title: "Organization",
-	// 	fullPath: "/master/organization",
-	// 	isNavbar: true,
-	// },
-	// {
-	// 	Component: lazy(
-	// 		() => import("@/pages/Master/Organization/AddOrganization"),
-	// 	),
-	// 	path: "organization/add",
-	// 	menu: "SYS00003",
-	// 	isLazy: true,
-	// },
-	// {
-	// 	Component: lazy(
-	// 		() => import("@/pages/Master/Organization/EditOrganization"),
-	// 	),
-	// 	path: "organization/edit/:id",
-	// 	menu: "SYS00004",
-	// 	isLazy: true,
-	// },
+	{
+		Component: lazy(() => import("@/pages/Master/Organization/Organization")),
+		path: "organization",
+		menu: "SYS00001",
+		isLazy: true,
+		title: "Organization",
+		fullPath: "/master/organization",
+		isNavbar: true,
+	},
+	{
+		Component: lazy(
+			() => import("@/pages/Master/Organization/AddOrganization"),
+		),
+		path: "organization/add",
+		menu: "SYS00003",
+		isLazy: true,
+	},
+	{
+		Component: lazy(
+			() => import("@/pages/Master/Organization/EditOrganization"),
+		),
+		path: "organization/edit/:id",
+		menu: "SYS00004",
+		isLazy: true,
+	},
 	{
 		Component: lazy(() => import("@/pages/Master/Position/Position")),
 		path: "position",
@@ -79,6 +80,14 @@ export const ROUTE_LEAVE = [
 		menu: true,
 		title: "Clock In/Out",
 		fullPath: "/leave/clock-in-out",
+		isNavbar: true,
+	},
+	{
+		Component: LeaveRequest,
+		path: "leave-request",
+		menu: true,
+		title: "Leave Request",
+		fullPath: "/leave/leave-request",
 		isNavbar: true,
 	},
 ];

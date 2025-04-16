@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { useDataTable } from "@/hooks/useDataTable";
 import { openFileOnNewPage } from "@/services/helper";
 
-const SubmitClockInOut = lazy(() => import("./patials/SubmitClockInOut"));
+const SubmitClockInOut = lazy(() => import("./partials/SubmitClockInOut"));
 
 const columnHelper = createColumnHelper();
 
