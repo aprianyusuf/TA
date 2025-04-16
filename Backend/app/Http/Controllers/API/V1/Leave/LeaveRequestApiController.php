@@ -16,7 +16,7 @@ class LeaveRequestApiController extends Controller
 
     public function index(Request $request)
     {
-        $data = $this->service->getLeaveRequest($request);
+        [$data, $count] = $this->service->getLeaveRequest($request);
         // dd($data);
         /**
          * @body array{status: string, code: int, data: LeaveRequestResource[], count: int}

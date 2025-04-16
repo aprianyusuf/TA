@@ -33,14 +33,15 @@ class LeaveRequestService
                     });
             });
         }
+        $count = $query->count('id');
 
-        return $query
-            ->search($request->search)
-            ->filter($request->filter)
-            ->sort($request->sort)
-            ->with(['user', 'leaveType'])
-            ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))->limit($request->get('size', 10))
-            ->get();
+        return [$query
+                ->search($request->search)
+                ->filter($request->filter)
+                ->sort($request->sort)
+                ->with(['user', 'leaveType'])
+                ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))->limit($request->get('size', 10))
+                ->get(), $count];
     }
 
     /**
