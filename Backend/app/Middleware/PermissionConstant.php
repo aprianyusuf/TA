@@ -28,6 +28,13 @@ enum PermissionConstant: string {
     case EDIT_CLIENT = "MD00014|edit_client|3|project_management";
     case DELETE_CLIENT = "MD00015|delete_client|3|project_management";
 
+    case MENU_LEAVE_REQUEST = "MD00016|menu_leave_request|4|leave";
+    case SHOW_LEAVE_REQUEST = "MD00017|show_leave_request|4|leave";
+    case ADD_LEAVE_REQUEST = "MD00018|add_leave_request|4|leave";
+    case RESPONSE_LEAVE_REQUEST = "MD00019|response_leave_request|4|leave";
+    case EDIT_LEAVE_REQUEST = "MD00020|edit_leave_request|4|leave";
+    case ABORT_LEAVE_REQUEST = "MD00021|abort_leave_request|4|leave";
+
     public static function names(): array
     {
         return array_column(self::cases(), 'name');

@@ -45,6 +45,7 @@ class DatabaseSeeder extends Seeder
                 ['id' => Str::ulid(), 'name' => 'CEO', 'organization_id' => $rdtOrganization->id, 'position_id' => null],
                 ['id' => Str::ulid(), 'name' => 'CTO', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
                 ['id' => Str::ulid(), 'name' => 'COO', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
+                ['id' => Str::ulid(), 'name' => 'HR', 'organization_id' => $rdtOrganization->id, 'position_id' => 'HR'],
                 ['id' => Str::ulid(), 'name' => 'Project Manager', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
                 ['id' => Str::ulid(), 'name' => 'Lead Software Engineer', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CTO'],
                 ['id' => Str::ulid(), 'name' => 'Software Engineer', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Lead Software Engineer'],
@@ -97,7 +98,8 @@ class DatabaseSeeder extends Seeder
                     'position_id' => 'COO',
                     'report_to_id' => 'Deo',
                     'subordinates' => [
-                        ['first_name' => 'Chaswanah', 'last_name' => 'Aini', 'position_id' => 'Business Development']
+                        ['first_name' => 'Chaswanah', 'last_name' => 'Aini', 'position_id' => 'Business Development'],
+                        ['first_name' => 'Aprian', 'last_name' => 'Yusuf', 'position_id' => 'HR']
                     ]
                 ],
             ];

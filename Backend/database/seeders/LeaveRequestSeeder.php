@@ -88,6 +88,7 @@ class LeaveRequestSeeder extends Seeder
                         DB::table('leave_requests')->insert([
                             'id'            => Str::ulid(),
                             'user_id'       => $user->id,
+                            'organization_id' => $user->organization_id,
                             'leave_type_id' => $leaveType->id,
                             'start_date'    => $randomStart,
                             'end_date'      => $finalEnd,

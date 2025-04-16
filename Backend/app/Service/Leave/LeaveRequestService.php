@@ -1,9 +1,11 @@
 <?php
 namespace App\Service\Leave;
 
-use Carbon\Carbon;
-use App\Models\LeaveType;
 use App\Models\LeaveRequest;
+use App\Models\LeaveType;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class LeaveRequestService
 {
@@ -15,16 +17,29 @@ class LeaveRequestService
         //
     }
 
-    public function getLeaveRequest($request)
+    public function getLeaveRequest(Request $request)
     {
-        // Implement the logic to retrieve leave requests based on the request parameters.
-        // This is a placeholder for the actual implementation.
-        return LeaveRequest::query()->with(
-            [
-                'user',
-                'leaveType',
-            ]
-        )->get();
+        $user  = $request->decoded;
+        // dd($user['organization']['id']);
+        $query = LeaveRequest::query()
+            ->where('organization_id', $user['organization']['id'])
+            ;
+
+        if (! in_array($user['position']['name'], ['HR', 'CEO'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user['id'])
+                    ->orWhereHas('user', function ($subQuery) use ($user) {
+                        $subQuery->where('report_to_id', $user['id']);
+                    });
+            });
+        }
+
+        return $query
+            ->search($request->search)
+            ->filter($request->filter)
+            ->sort($request->sort)
+            ->with(['user', 'leaveType'])
+            ->get();
     }
 
     /**
@@ -140,10 +155,9 @@ class LeaveRequestService
             foreach ($periodTypes as $period) {
                 $boundaries = $this->getPeriodBoundaries($referenceDate, $period);
                 $used       = $this->getUsedLeaveDays($userId, $leaveType->id, $boundaries['start'], $boundaries['end']);
-                // Get max allowed days for the period from the leave type. Use field naming convention.
-                $maxField = 'max_days' . ($period === 'year' ? '_per_year' : ($period === 'month' ? '_per_month' : ($period === 'week' ? '_per_week' : ($period === 'quarter' ? '_per_quarter' : ($period === 'half_year' ? '_per_half_year' : '')))));
-                // Fallback to general max_days if period-specific is not set.
-                $maxAllowed              = $leaveType->{$maxField} ?? $leaveType->max_days;
+                $maxField   = $this->getMaxFieldForPeriod($period);
+                $maxAllowed = $leaveType->{$maxField} ?? $leaveType->max_days;
+
                 $usedQuota[$period]      = $used;
                 $remainingQuota[$period] = $this->calculateRemainingQuota($maxAllowed, $used);
             }
@@ -181,10 +195,11 @@ class LeaveRequestService
         foreach ($periodTypes as $period) {
             $boundaries = $this->getPeriodBoundaries($referenceDate, $period);
             $used       = $this->getUsedLeaveDays($userId, $leaveType->id, $boundaries['start'], $boundaries['end']);
-            $maxField   = 'max_days' . ($period === 'year' ? '_per_year' : ($period === 'month' ? '_per_month' : ($period === 'week' ? '_per_week' : ($period === 'quarter' ? '_per_quarter' : ($period === 'half_year' ? '_per_half_year' : '')))));
+            $maxField   = $this->getMaxFieldForPeriod($period);
             $maxAllowed = $leaveType->{$maxField} ?? $leaveType->max_days;
+
             if (! is_null($maxAllowed) && ($used + $requestedDays) > $maxAllowed) {
-                $errors[] = "Exceeds {$period} limit.";
+                $errors[] = "Exceeds {$period} limit: used {$used}, requested {$requestedDays}, allowed {$maxAllowed}.";
             }
         }
 
@@ -193,4 +208,17 @@ class LeaveRequestService
             'message' => empty($errors) ? null : implode(' ', $errors),
         ];
     }
+
+    protected function getMaxFieldForPeriod(string $period): string
+    {
+        return match ($period) {
+            'year' => 'max_days_per_year',
+            'month' => 'max_days_per_month',
+            'week' => 'max_days_per_week',
+            'quarter' => 'max_days_per_quarter',
+            'half_year' => 'max_days_per_half_year',
+            default => 'max_days',
+        };
+    }
+
 }

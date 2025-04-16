@@ -1,26 +1,27 @@
 <?php
 
-use App\Http\Controllers\API\V1\Authentication\AuthenticationApiController;
-use App\Http\Controllers\API\V1\Foundation\EmployeeApiController;
+use Illuminate\Support\Str;
+use Dedoc\Scramble\Scramble;
+use Illuminate\Http\Request;
+use Dedoc\Scramble\Generator;
+use Illuminate\Support\Facades\DB;
+use App\Models\Foundation\Employee;
+use App\Models\Foundation\Permission;
+use Illuminate\Support\Facades\Route;
+use App\Middleware\PermissionConstant;
+use App\Utils\Enums\EmploymentTypeEnum;
+use App\Middleware\EnsureUserHasPermission;
+use App\Middleware\AuthenticationMiddleware;
 use App\Http\Controllers\API\V1\Foundation\FileApiController;
-use App\Http\Controllers\API\V1\Foundation\OrganizationApiController;
-use App\Http\Controllers\API\V1\Foundation\PositionApiController;
 use App\Http\Controllers\API\V1\Leave\AttendanceApiController;
+use App\Http\Controllers\API\V1\Leave\LeaveRequestApiController;
+use App\Http\Controllers\API\V1\Foundation\EmployeeApiController;
+use App\Http\Controllers\API\V1\Foundation\PositionApiController;
+use App\Http\Controllers\API\V1\Foundation\OrganizationApiController;
 use App\Http\Controllers\API\V1\ProjectManagement\ClientApiController;
 use App\Http\Controllers\API\V1\ProjectManagement\ProjectApiController;
 use App\Http\Controllers\API\V1\Timesheet\EmployeeTimesheetApiController;
-use App\Middleware\AuthenticationMiddleware;
-use App\Middleware\EnsureUserHasPermission;
-use App\Middleware\PermissionConstant;
-use App\Models\Foundation\Employee;
-use App\Models\Foundation\Permission;
-use App\Utils\Enums\EmploymentTypeEnum;
-use Dedoc\Scramble\Generator;
-use Dedoc\Scramble\Scramble;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\V1\Authentication\AuthenticationApiController;
 
 Route::prefix('auth')
     ->controller(AuthenticationApiController::class)->group(function () {
@@ -93,6 +94,15 @@ Route::prefix('v1')->group(function () {
                             Route::post('/today', 'postClockInToday');
                         });
                 });
+            });
+
+    Route::controller(LeaveRequestApiController::class)
+        ->prefix('leave-request')
+        ->group(function () {
+            Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_LEAVE_REQUEST->value)[0]);
+            Route::post('/create', 'store')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::ADD_LEAVE_REQUEST->value)[0]);
+            Route::put('/update/{id}', 'update')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
+            Route::get('/{id}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_LEAVE_REQUEST->value)[0]);
         });
 
     Route::prefix('timesheet')

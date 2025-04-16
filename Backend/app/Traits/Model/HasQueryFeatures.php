@@ -1,6 +1,8 @@
 <?php
 namespace App\Traits\Model;
 
+use Illuminate\Support\Collection;
+
 trait HasQueryFeatures
 {
     //
@@ -29,17 +31,25 @@ trait HasQueryFeatures
     }
 
     public function scopeFilter($query, $filters)
-    {
-        if (! property_exists($this, 'filterable')) {
-            return;
-        }
+{
+    if (!property_exists($this, 'filterable') || !$filters) {
+        return;
+    }
 
-        foreach ($this->filterable as $field) {
-            if ($filters->has($field)) {
-                $query->where($field, $filters->get($field));
-            }
+    if (is_array($filters)) {
+        $filters = collect($filters);
+    }
+
+    if (!($filters instanceof Collection)) {
+        return;
+    }
+
+    foreach ($this->filterable as $field) {
+        if ($filters->has($field)) {
+            $query->where($field, $filters->get($field));
         }
     }
+}
 
     public function scopePaginateResults($query, $perPage = 15)
     {
