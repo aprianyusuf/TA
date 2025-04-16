@@ -20,10 +20,9 @@ class LeaveRequestService
     public function getLeaveRequest(Request $request)
     {
         $user = $request->decoded;
-        // dd($user['name']);
+
         $query = LeaveRequest::query()
-            ->where('organization_id', $user['organization']['id'])
-        ;
+            ->where('organization_id', $user['organization']['id']);
 
         if (! in_array($user['position']['name'], ['HR', 'CEO'])) {
             $query->where(function ($q) use ($user) {
@@ -33,15 +32,21 @@ class LeaveRequestService
                     });
             });
         }
+
+        $query = $query
+            ->search($request->search)
+            ->filter($request->filter)
+            ->sort($request->sort);
+
         $count = $query->count('id');
 
-        return [$query
-                ->search($request->search)
-                ->filter($request->filter)
-                ->sort($request->sort)
-                ->with(['user', 'leaveType'])
-                ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))->limit($request->get('size', 10))
-                ->get(), $count];
+        $data = $query
+            ->with(['user', 'leaveType'])
+            ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
+            ->limit($request->get('size', 10))
+            ->get();
+
+        return [$data, $count];
     }
 
     /**

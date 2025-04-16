@@ -21,7 +21,7 @@ class LeaveRequestApiController extends Controller
         /**
          * @body array{status: string, code: int, data: LeaveRequestResource[], count: int}
          */
-        return $this->successResponse(LeaveRequestResource::collection($data), optionalResponses: ['count' => $data->count()]);
+        return $this->successResponse(LeaveRequestResource::collection($data), optionalResponses: ['count' => $count]);
     }
 
 }
