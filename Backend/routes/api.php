@@ -94,10 +94,10 @@ Route::prefix('v1')->group(function () {
                             Route::post('/today', 'postClockInToday');
                         });
                 });
-            });
+        });
 
-    Route::controller(LeaveRequestApiController::class)
-        ->prefix('leave-request')
+    Route::prefix('leave-request')
+        ->controller(LeaveRequestApiController::class)
         ->group(function () {
             Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_LEAVE_REQUEST->value)[0]);
             Route::post('/create', 'store')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::ADD_LEAVE_REQUEST->value)[0]);

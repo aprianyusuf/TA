@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Service\Leave;
 
+use App\Http\Requests\Leave\StoreLeaveRequest;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
-use App\Models\User;
+use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class LeaveRequestService
 {
@@ -228,4 +231,26 @@ class LeaveRequestService
         };
     }
 
+    public function createLeaveRequest(StoreLeaveRequest $request, int $duration)
+    {
+        $leaveRequest = LeaveRequest::query()->create([
+            'id'            => Str::ulid(),
+            'user_id'       => $request->decoded->get('id'),
+            'organization_id' => $request->decoded->get("organization")?->get("id"),
+            'leave_type_id' => $request->leaveType,
+            'start_date'    => $request->startDate,
+            'end_date'      => $request->endDate,
+            'days'          => $duration,
+            'status'        => LeaveRequestStatus::Pending,
+            'description'   => $request->description,
+            'created_at'    => now(),
+        ]);
+
+        return $this->showLeaveRequest($leaveRequest->id);
+    }
+
+    public function showLeaveRequest(string $id): ?LeaveRequest
+    {
+        return LeaveRequest::query()->where("id", $id)->first();
+    }
 }

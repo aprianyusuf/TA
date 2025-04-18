@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Base\Model;
 use App\Traits\Model\HasQueryFeatures;
+use App\Utils\Enums\LeaveRequestStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LeaveRequest extends Model
@@ -20,7 +21,7 @@ class LeaveRequest extends Model
         'status',
         'reason',
         'response_by',
-        'response_at',
+        'responded_at',
     ];
     protected $sortable = [
         'id',
@@ -29,9 +30,9 @@ class LeaveRequest extends Model
         'start_date',
         'end_date',
         'status',
-        'reason',
-        'response_by',
-        'response_at',
+        'description',
+        'responded_by',
+        'responded_at',
     ];
 
     protected $filterable = [
@@ -41,26 +42,28 @@ class LeaveRequest extends Model
         'start_date',
         'end_date',
         'status',
-        'reason',
-        'response_by',
-        'response_at',
+        'description',
+        'responded_by',
+        'responded_at',
     ];
 
     protected $table = 'leave_requests';
     protected $fillable = [
         'user_id',
         'leave_type_id',
+        'organization_id',
+        'description',
         'start_date',
         'end_date',
         'status',
-        'reason',
-        'response_by',
-        'response_at',
+        'responded_by',
+        'responded_at',
     ];
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
-        'response_at' => 'datetime',
+        'responded_at' => 'datetime',
+        'status' => LeaveRequestStatus::class
     ];
 
     protected $with = [
@@ -70,15 +73,15 @@ class LeaveRequest extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function responder()
     {
-        return $this->belongsTo(User::class,'responded_by', 'id');
+        return $this->belongsTo(User::class, 'responded_by', 'id');
     }
     public function leaveType()
     {
-        return $this->belongsTo(LeaveType::class,'leave_type_id', 'id');
+        return $this->belongsTo(LeaveType::class, 'leave_type_id', 'id');
     }
 }
