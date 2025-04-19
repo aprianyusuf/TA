@@ -4,6 +4,7 @@ namespace App\Http\Requests\Leave;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
+use App\Service\Leave\LeaveRequestService;
 
 class StoreLeaveRequest extends FormRequest
 {
@@ -37,25 +38,16 @@ class StoreLeaveRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
+    public function withValidator($validator): void
     {
-        $validator->after(function ($validator) {
-            $start = Carbon::parse($this->start_date);
-            $end = Carbon::parse($this->end_date);
+        $service = app(LeaveRequestService::class);
 
-            $workingDays = 0;
-            $current = $start->copy();
-
-            while ($current->lte($end)) {
-                if (!$current->isWeekend()) {
-                    $workingDays++;
-                }
-                $current->addDay();
-            }
-
-            if ($workingDays > 30) {
-                $validator->errors()->add('end_date', 'The leave period cannot exceed 30 working days.');
-            }
+        $validator->after(function ($validator) use ($service) {
+            $service->validateWorkingDays(
+                $validator,
+                $this->input('startDate'),
+                $this->input('endDate')
+            );
         });
     }
 }

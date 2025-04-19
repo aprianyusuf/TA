@@ -61,7 +61,22 @@ class LeaveRequestApiController extends Controller
         }
 
         // create count duration of workdays here
-        $leaveRequest = $leaveRequestService->createLeaveRequest($request, 1);
+        $workingDays = $leaveRequestService->calculateWorkingDays(
+            $request->input('startDate'),
+            $request->input('endDate')
+        );
+
+        if ($workingDays > 30) {
+            /**
+             * Leave request are not allowed
+             * 
+             * @status 406
+             * @body ErrorResource
+             */
+            return $this->errorResponse("The leave period cannot exceed 30 working days.", Response::HTTP_NOT_ACCEPTABLE);
+        }
+
+        $leaveRequest = $leaveRequestService->createLeaveRequest($request, $workingDays);
 
         return $this->successResponse(data: $leaveRequest, message: 'Success create leave request');
     }
