@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Leave;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Carbon;
 use App\Service\Leave\LeaveRequestService;
 
 class StoreLeaveRequest extends FormRequest

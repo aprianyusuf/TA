@@ -1,14 +1,19 @@
 <?php
+
 namespace App\Service\Leave;
 
 use App\Http\Requests\Leave\StoreLeaveRequest;
+use App\Http\Requests\Leave\UpdateLeaveRequest;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\User;
 use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\DB;
+
 
 class LeaveRequestService
 {
@@ -169,8 +174,9 @@ class LeaveRequestService
         }
 
         return [
-            'used_quota'=>$usedQuota,
-            'remaining_quota'=>$remainingQuota];
+            'used_quota' => $usedQuota,
+            'remaining_quota' => $remainingQuota
+        ];
     }
 
     public function getAllLeaveQuota(string $userId, $referenceDate = null): array
@@ -287,5 +293,47 @@ class LeaveRequestService
         if ($workingDays > 30) {
             $validator->errors()->add('endDate', 'The leave period cannot exceed 30 working days.');
         }
+    }
+
+    public function approveLeaveRequest(LeaveRequest $leaveRequest, string $approverId)
+    {
+        return DB::transaction(function () use ($leaveRequest, $approverId) {
+            $leaveRequest->update([
+                'status'        => LeaveRequestStatus::Approved,
+                'responded_by'  => $approverId,
+                'responded_at'  => Carbon::now(),
+            ]);
+
+            return $leaveRequest;
+        });
+    }
+
+    public function rejectLeaveRequest(LeaveRequest $leaveRequest, string $approverId)
+    {
+        return DB::transaction(function () use ($leaveRequest, $approverId) {
+            $leaveRequest->update([
+                'status'        => LeaveRequestStatus::Rejected,
+                'responded_by'  => $approverId,
+                'responded_at'  => Carbon::now(),
+            ]);
+
+            return $leaveRequest;
+        });
+    }
+
+    public function hasPermissionToActOnLeaveRequest(LeaveRequest $leaveRequest, User $user)
+    {
+        $validPositions = ['HR', 'CEO'];
+        $approverPosition = $user ? $user->position : null;
+
+        if (in_array($approverPosition, $validPositions)) {
+            return true;
+        }
+
+        if ($user->ida === User::find($leaveRequest->user_id)->report_to_id) {
+            return true;
+        }
+
+        return false;
     }
 }

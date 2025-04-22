@@ -4,9 +4,13 @@ namespace App\Http\Controllers\API\V1\Leave;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Leave\StoreLeaveRequest as LeaveStoreLeaveRequest;
+use App\Http\Requests\Leave\UpdateLeaveRequest;
 use App\Http\Resources\Leave\LeaveRequestResource;
+use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\User;
 use App\Service\Leave\LeaveRequestService;
+use App\Utils\Enums\LeaveRequestStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -79,5 +83,77 @@ class LeaveRequestApiController extends Controller
         $leaveRequest = $leaveRequestService->createLeaveRequest($request, $workingDays);
 
         return $this->successResponse(data: $leaveRequest, message: 'Success create leave request');
+    }
+
+    public function approve(Request $request, string $leaveRequestId, LeaveRequestService $leaveRequestService)
+    {
+        $leaveRequest = LeaveRequest::where('id', $leaveRequestId)
+            ->where('organization_id', $request->decoded->get('organization')?->get('id'))
+            ->where('status', LeaveRequestStatus::Pending)
+            ->first();
+
+        if ($leaveRequest == null) {
+            /**
+             * Leave request not found
+             * @status 404
+             *
+             * @body ErrorResource
+             */
+            return $this->errorResponse('Leave request not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $approver = User::find($request->decoded->get('id'));
+
+        $hasPermission = $leaveRequestService->hasPermissionToActOnLeaveRequest($leaveRequest, $approver,);
+
+        if (!$hasPermission) {
+            /**
+             * Approve action not allowed
+             * @status 403
+             *
+             * @body ErrorResource
+             */
+            return $this->errorResponse('Permission denied', Response::HTTP_FORBIDDEN);
+        }
+
+        $approved = $leaveRequestService->approveLeaveRequest($leaveRequest, $request->decoded->get('id'));
+
+        return $this->successResponse(data: $approved, message: 'Success approve leave request');
+    }
+
+    public function reject(Request $request, string $leaveRequestId, LeaveRequestService $leaveRequestService)
+    {
+        $leaveRequest = LeaveRequest::where('id', $leaveRequestId)
+            ->where('organization_id', $request->decoded->get('organization')?->get('id'))
+            ->where('status', LeaveRequestStatus::Pending)
+            ->first();
+
+        if ($leaveRequest == null) {
+            /**
+             * Leave request not found
+             * @status 404
+             *
+             * @body ErrorResource
+             */
+            return $this->errorResponse('Leave request not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $approver = User::find($request->decoded->get('id'));
+
+        $hasPermission = $leaveRequestService->hasPermissionToActOnLeaveRequest($leaveRequest, $approver);
+
+        if (!$hasPermission) {
+            /**
+             * Approve action not allowed
+             * @status 403
+             *
+             * @body ErrorResource
+             */
+            return $this->errorResponse('Permission denied', Response::HTTP_FORBIDDEN);
+        }
+
+        $rejected = $leaveRequestService->rejectLeaveRequest($leaveRequest, $request->decoded->get('id'));
+
+        return $this->successResponse(data: $rejected, message: 'Success reject leave request');
     }
 }

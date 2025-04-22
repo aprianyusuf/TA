@@ -21,15 +21,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
     ->controller(AuthenticationApiController::class)->group(function () {
-    Route::post('/login', 'login')
-        ->withoutMiddleware(AuthenticationMiddleware::class);
-    Route::post('/refresh-token', 'refreshToken')
-        ->withoutMiddleware(AuthenticationMiddleware::class);
+        Route::post('/login', 'login')
+            ->withoutMiddleware(AuthenticationMiddleware::class);
+        Route::post('/refresh-token', 'refreshToken')
+            ->withoutMiddleware(AuthenticationMiddleware::class);
 
-    if (config('app.enable_change_user')) {
-        Route::post('/change-user', 'changeUser');
-    }
-});
+        if (config('app.enable_change_user')) {
+            Route::post('/change-user', 'changeUser');
+        }
+    });
 
 Route::prefix('v1')->group(function () {
     Route::prefix('foundation')
@@ -97,8 +97,8 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_LEAVE_REQUEST->value)[0]);
             Route::post('/create', 'store')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::ADD_LEAVE_REQUEST->value)[0]);
-            Route::put('/update/{id}', 'update')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
-            Route::get('/{id}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_LEAVE_REQUEST->value)[0]);
+            Route::put('/{id}/approve', 'approve')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
+            Route::put('/{id}/reject', 'reject')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
         });
 
     Route::prefix('leave-type')
