@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Service\Leave;
 
 use App\Http\Requests\Leave\StoreLeaveRequest;
@@ -149,31 +148,39 @@ class LeaveRequestService
      * @param  Carbon|string|null $referenceDate Optional, default now
      * @return array
      */
-    public function getLeaveQuota(string $userId, $referenceDate = null): array
+    public function getLeaveQuota(string $userId, $leaveType, $referenceDate = null): array
     {
-        $referenceDate = $referenceDate ? Carbon::parse($referenceDate) : Carbon::now();
-        $periodTypes   = ['year', 'month', 'week', 'quarter', 'half_year'];
+        if (! $leaveType instanceof LeaveType) {
+            $leaveType = LeaveType::find($leaveType);
+        }
+        $referenceDate  = $referenceDate ? Carbon::parse($referenceDate) : Carbon::now();
+        $periodTypes    = ['year', 'month', 'week', 'quarter', 'half_year'];
+        $usedQuota      = [];
+        $remainingQuota = [];
 
-        // Retrieve all leave types (you may filter by organization if needed)
+        foreach ($periodTypes as $period) {
+            $boundaries = $this->getPeriodBoundaries($referenceDate, $period);
+            $used       = $this->getUsedLeaveDays($userId, $leaveType->id, $boundaries['start'], $boundaries['end']);
+            $maxField   = $this->getMaxFieldForPeriod($period);
+            $maxAllowed = $leaveType->{$maxField} ?? $leaveType->max_days;
+
+            $usedQuota[$period]      = $used;
+            $remainingQuota[$period] = $this->calculateRemainingQuota($maxAllowed, $used);
+        }
+
+        return [
+            'used_quota'=>$usedQuota,
+            'remaining_quota'=>$remainingQuota];
+    }
+
+    public function getAllLeaveQuota(string $userId, $referenceDate = null): array
+    {
         $leaveTypes = LeaveType::all();
-
-        $result = [];
+        $result     = [];
 
         foreach ($leaveTypes as $leaveType) {
-            $usedQuota      = [];
-            $remainingQuota = [];
-
-            foreach ($periodTypes as $period) {
-                $boundaries = $this->getPeriodBoundaries($referenceDate, $period);
-                $used       = $this->getUsedLeaveDays($userId, $leaveType->id, $boundaries['start'], $boundaries['end']);
-                $maxField   = $this->getMaxFieldForPeriod($period);
-                $maxAllowed = $leaveType->{$maxField} ?? $leaveType->max_days;
-
-                $usedQuota[$period]      = $used;
-                $remainingQuota[$period] = $this->calculateRemainingQuota($maxAllowed, $used);
-            }
-
-            $result[] = [
+            [$usedQuota, $remainingQuota] = $this->getLeaveQuota($userId, $leaveType, $referenceDate);
+            $result[]                     = [
                 'leave_type'      => $leaveType,
                 'used_quota'      => $usedQuota,
                 'remaining_quota' => $remainingQuota,
@@ -235,16 +242,16 @@ class LeaveRequestService
     public function createLeaveRequest(StoreLeaveRequest $request, int $duration)
     {
         $leaveRequest = LeaveRequest::query()->create([
-            'id'            => Str::ulid(),
-            'user_id'       => $request->decoded->get('id'),
+            'id'              => Str::ulid(),
+            'user_id'         => $request->decoded->get('id'),
             'organization_id' => $request->decoded->get("organization")?->get("id"),
-            'leave_type_id' => $request->leaveType,
-            'start_date'    => $request->startDate,
-            'end_date'      => $request->endDate,
-            'days'          => $duration,
-            'status'        => LeaveRequestStatus::Pending,
-            'description'   => $request->description,
-            'created_at'    => now(),
+            'leave_type_id'   => $request->leaveType,
+            'start_date'      => $request->startDate,
+            'end_date'        => $request->endDate,
+            'days'            => $duration,
+            'status'          => LeaveRequestStatus::Pending,
+            'description'     => $request->description,
+            'created_at'      => now(),
         ]);
 
         return $this->showLeaveRequest($leaveRequest->id);
@@ -258,13 +265,13 @@ class LeaveRequestService
     public function calculateWorkingDays(string $startDate, string $endDate): int
     {
         $start = Carbon::parse($startDate);
-        $end = Carbon::parse($endDate);
+        $end   = Carbon::parse($endDate);
 
         $workingDays = 0;
-        $current = $start->copy();
+        $current     = $start->copy();
 
         while ($current->lte($end)) {
-            if (!$current->isWeekend()) {
+            if (! $current->isWeekend()) {
                 $workingDays++;
             }
             $current->addDay();

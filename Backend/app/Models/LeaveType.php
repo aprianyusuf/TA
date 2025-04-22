@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Models\Base\Model;
+use App\Traits\Model\HasQueryFeatures;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LeaveType extends Model
 {
     /** @use HasFactory<\Database\Factories\LeaveTypeFactory> */
-    use HasFactory;
+    use HasFactory, HasQueryFeatures;
 
     protected $fillable = [
         'id',

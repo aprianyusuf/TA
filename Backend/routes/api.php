@@ -1,39 +1,35 @@
 <?php
 
-use Illuminate\Support\Str;
-use Dedoc\Scramble\Scramble;
-use Illuminate\Http\Request;
-use Dedoc\Scramble\Generator;
-use Illuminate\Support\Facades\DB;
-use App\Models\Foundation\Employee;
-use App\Models\Foundation\Permission;
-use Illuminate\Support\Facades\Route;
-use App\Middleware\PermissionConstant;
-use App\Utils\Enums\EmploymentTypeEnum;
-use App\Middleware\EnsureUserHasPermission;
-use App\Middleware\AuthenticationMiddleware;
+use App\Http\Controllers\API\V1\Authentication\AuthenticationApiController;
+use App\Http\Controllers\API\V1\Foundation\EmployeeApiController;
 use App\Http\Controllers\API\V1\Foundation\FileApiController;
+use App\Http\Controllers\API\V1\Foundation\OrganizationApiController;
+use App\Http\Controllers\API\V1\Foundation\PositionApiController;
 use App\Http\Controllers\API\V1\Leave\AttendanceApiController;
 use App\Http\Controllers\API\V1\Leave\LeaveRequestApiController;
-use App\Http\Controllers\API\V1\Foundation\EmployeeApiController;
-use App\Http\Controllers\API\V1\Foundation\PositionApiController;
-use App\Http\Controllers\API\V1\Foundation\OrganizationApiController;
+use App\Http\Controllers\API\V1\Leave\LeaveTypeApiController;
 use App\Http\Controllers\API\V1\ProjectManagement\ClientApiController;
 use App\Http\Controllers\API\V1\ProjectManagement\ProjectApiController;
 use App\Http\Controllers\API\V1\Timesheet\EmployeeTimesheetApiController;
-use App\Http\Controllers\API\V1\Authentication\AuthenticationApiController;
+use App\Middleware\AuthenticationMiddleware;
+use App\Middleware\EnsureUserHasPermission;
+use App\Middleware\PermissionConstant;
+use Dedoc\Scramble\Generator;
+use Dedoc\Scramble\Scramble;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
     ->controller(AuthenticationApiController::class)->group(function () {
-        Route::post('/login', 'login')
-            ->withoutMiddleware(AuthenticationMiddleware::class);
-        Route::post('/refresh-token', 'refreshToken')
-            ->withoutMiddleware(AuthenticationMiddleware::class);
+    Route::post('/login', 'login')
+        ->withoutMiddleware(AuthenticationMiddleware::class);
+    Route::post('/refresh-token', 'refreshToken')
+        ->withoutMiddleware(AuthenticationMiddleware::class);
 
-        if (config('app.enable_change_user')) {
-            Route::post('/change-user', 'changeUser');
-        }
-    });
+    if (config('app.enable_change_user')) {
+        Route::post('/change-user', 'changeUser');
+    }
+});
 
 Route::prefix('v1')->group(function () {
     Route::prefix('foundation')
@@ -105,6 +101,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_LEAVE_REQUEST->value)[0]);
         });
 
+    Route::prefix('leave-type')
+        ->controller(LeaveTypeApiController::class)
+        ->group(function () {
+            Route::get('/', 'index');
+        });
+
     Route::prefix('timesheet')
         ->group(function () {
             Route::controller(EmployeeTimesheetApiController::class)
@@ -170,14 +172,14 @@ Route::prefix('v1')->group(function () {
         });
 
     Route::get('/docs', function (Request $request, Generator $generator) {
-        if (!app()->isLocal() && $request->get('token', '') != 'development-docs') {
+        if (! app()->isLocal() && $request->get('token', '') != 'development-docs') {
             return response()->json('not found');
         }
 
         $config = Scramble::getGeneratorConfig('default');
 
         return view('scramble::docs', [
-            'spec' => $generator($config),
+            'spec'   => $generator($config),
             'config' => $config,
         ]);
     })->withoutMiddleware(AuthenticationMiddleware::class);

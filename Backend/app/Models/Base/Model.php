@@ -11,6 +11,8 @@ class Model extends DefaultModel
     use HasFactory;
 
     public $incrementing = false;
+
+    protected $primaryKey = 'id';
     protected $keyType = 'string';
 
     protected static function boot()
