@@ -1,11 +1,15 @@
 <?php
+
 namespace App\Service\Leave;
 
+use App\Http\Requests\Leave\StoreLeaveRequest;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
-use App\Models\User;
+use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Validator;
 
 class LeaveRequestService
 {
@@ -228,4 +232,53 @@ class LeaveRequestService
         };
     }
 
+    public function createLeaveRequest(StoreLeaveRequest $request, int $duration)
+    {
+        $leaveRequest = LeaveRequest::query()->create([
+            'id'            => Str::ulid(),
+            'user_id'       => $request->decoded->get('id'),
+            'organization_id' => $request->decoded->get("organization")?->get("id"),
+            'leave_type_id' => $request->leaveType,
+            'start_date'    => $request->startDate,
+            'end_date'      => $request->endDate,
+            'days'          => $duration,
+            'status'        => LeaveRequestStatus::Pending,
+            'description'   => $request->description,
+            'created_at'    => now(),
+        ]);
+
+        return $this->showLeaveRequest($leaveRequest->id);
+    }
+
+    public function showLeaveRequest(string $id): ?LeaveRequest
+    {
+        return LeaveRequest::query()->where("id", $id)->first();
+    }
+
+    public function calculateWorkingDays(string $startDate, string $endDate): int
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        $workingDays = 0;
+        $current = $start->copy();
+
+        while ($current->lte($end)) {
+            if (!$current->isWeekend()) {
+                $workingDays++;
+            }
+            $current->addDay();
+        }
+
+        return $workingDays;
+    }
+
+    public function validateWorkingDays(Validator $validator, string $startDate, string $endDate): void
+    {
+        $workingDays = $this->calculateWorkingDays($startDate, $endDate);
+
+        if ($workingDays > 30) {
+            $validator->errors()->add('endDate', 'The leave period cannot exceed 30 working days.');
+        }
+    }
 }

@@ -6,7 +6,7 @@ import {
 	setSeconds,
 } from "date-fns";
 import { jwtDecode } from "jwt-decode";
-
+import { differenceInCalendarDays } from "date-fns";
 import FileApi from "@/apis/v1/FileApi";
 import { useBoundStore } from "@/stores";
 
@@ -134,6 +134,11 @@ export function calculateTimeDifference(startDate, endDate) {
 		.join(" ");
 
 	return result;
+}
+
+export function calculateTimeDifferenceDays(startDate, endDate) {
+	const days = differenceInCalendarDays(endDate, startDate);
+	return `${days}d`;
 }
 
 function invertHexColor(hex) {

@@ -1,9 +1,11 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\LeaveType;
 use App\Models\User;
 use App\Service\Leave\LeaveRequestService;
+use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +38,7 @@ class LeaveRequestSeeder extends Seeder
 
         // Loop through each user to generate leave requests
         foreach ($users as $user) {
-            if ($user->organization->domain == 'mitrasaburaiproperti.com' ) {
+            if ($user->organization->domain == 'mitrasaburaiproperti.com') {
                 $this->createLeaveRequest($user, $pastYearMonths, $leaveService);
             }
         }
@@ -93,7 +95,7 @@ class LeaveRequestSeeder extends Seeder
                             'start_date'    => $randomStart,
                             'end_date'      => $finalEnd,
                             'days'          => $validatedDuration,
-                            'status'        => 1, // Approved
+                            'status'        => LeaveRequestStatus::Approved,
                             'description'   => 'Seeded leave request',
                             'created_at'    => Carbon::now(),
                             'updated_at'    => Carbon::now(),
