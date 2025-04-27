@@ -174,7 +174,7 @@ class AuthenticationApiController extends Controller
             return $this->errorResponse('User not found', Response::HTTP_NOT_FOUND);
         }
 
-        $user->load('organization');
+        $user->load('organization', 'position');
 
         $timezone = new DateTimeZone($request->timezone);
         $datetime = new DateTime('now', $timezone);
@@ -189,6 +189,10 @@ class AuthenticationApiController extends Controller
             'email'           => $user->email,
             'timezone'        => $request->timezone,
             'timezone_offset' => $offsetInHours,
+            'position'        => collect([
+                'id'   => $user->position->id,
+                'name' => $user->position->name,
+            ]),
             'permission'      => DB::table('permission_position as pp')
                 ->join('permissions as p', 'pp.permission_id', 'p.id')
                 ->join('users as u', function (JoinClause $join) use ($user) {
@@ -261,7 +265,7 @@ class AuthenticationApiController extends Controller
             return $this->errorResponse('User not found', Response::HTTP_NOT_FOUND);
         }
 
-        $user->load('organization');
+        $user->load('organization', 'position');
 
         $payload = collect([
             'id'              => $user->id,
@@ -271,6 +275,10 @@ class AuthenticationApiController extends Controller
             'email'           => $user->email,
             'timezone'        => $request->timezone,
             'timezone_offset' => $user->timezone_offset,
+            'position'        => collect([
+                'id'   => $user->position->id,
+                'name' => $user->position->name,
+            ]),
             'permission'      => DB::table('permission_position as pp')
                 ->join('permissions as p', 'pp.permission_id', 'p.id')
                 ->join('users as u', function (JoinClause $join) use ($user) {
