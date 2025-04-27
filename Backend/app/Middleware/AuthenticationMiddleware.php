@@ -17,6 +17,9 @@ class AuthenticationMiddleware
 
     public function handle(Request $request, Closure $next)
     {
+        if($request->is('telescope/*')) {
+            return $next($request);
+        }
         try {
             $user = (new AuthService)->getJwt();
 
@@ -28,7 +31,7 @@ class AuthenticationMiddleware
         } catch (AuthenticationException $e) {
             /**
              * @status 401
-             * 
+             *
              * @response array{status: string, code: int, message: string}
              */
             Log::error($e->getMessage(), [
@@ -41,7 +44,7 @@ class AuthenticationMiddleware
         } catch (Exception $e) {
             /**
              * @status 500
-             * 
+             *
              * @response array{status: string, code: int, message: string}
              */
             Log::error($e->getMessage(), [
