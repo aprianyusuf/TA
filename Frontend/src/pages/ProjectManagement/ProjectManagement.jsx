@@ -28,9 +28,9 @@ const ProjectManagement = () => {
 
 	return (
 		<>
-			<Routes>
+			<Routes key={token}>
 				{ROUTE_PROJECT_MANAGEMENT.filter(
-					(v) => permission.includes(v.menu) || v.menu === true,
+					(v) => v.menu === true || permission.includes(v.menu)
 				).map(({ path, Component, isLazy }, key) => (
 					<Route
 						key={key}

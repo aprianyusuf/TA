@@ -2,7 +2,7 @@ import { lazy } from "react";
 
 import ClockInOut from "./pages/Leave/ClockInOut/ClockInOut";
 import LeaveRequest from "./pages/Leave/Request/LeaveRequest";
-import Salary from "./pages/Payroll/Salary/Salary";
+// import Salary from "./pages/Payroll/Salary/Salary";
 
 export const ROUTE_MASTER = [
 	// {

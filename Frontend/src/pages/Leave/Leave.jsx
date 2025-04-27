@@ -28,9 +28,9 @@ const Leave = () => {
 
 	return (
 		<>
-			<Routes>
+			<Routes key={token}>
 				{ROUTE_LEAVE.filter(
-					(v) => permission.includes(v.menu) || v.menu === true,
+					(v) => v.menu === true || permission.includes(v.menu)
 				).map(({ path, Component, isLazy }, key) => (
 					<Route
 						key={key}
@@ -39,7 +39,7 @@ const Leave = () => {
 							isLazy ? (
 								<Suspense
 									fallback={
-										<div className="flex h-full w-full items-center justify-center">
+										<div className="flex items-center justify-center w-full h-full">
 											<Spinner />
 										</div>
 									}

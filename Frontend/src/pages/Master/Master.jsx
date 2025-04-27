@@ -1,14 +1,14 @@
 import React, { Suspense, useEffect, useState } from "react";
 
 import { jwtDecode } from "jwt-decode";
-import { Route, Routes, useNavigate } from "react-router";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
 
 import { Spinner } from "@/components/atoms/Spinner";
 import { ROUTE_MASTER } from "@/routes";
 import { useBoundStore } from "@/stores";
 
 const Master = () => {
-	const navigate = useNavigate();
+	const navigate = useLocation();
 	const [permission, setPermission] = useState([]);
 
 	const { token } = useBoundStore((s) => s);
@@ -38,7 +38,7 @@ const Master = () => {
 								isLazy ? (
 									<Suspense
 										fallback={
-											<div className="flex h-full w-full items-center justify-center">
+											<div className="flex items-center justify-center w-full h-full">
 												<Spinner />
 											</div>
 										}
