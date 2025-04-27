@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { add, format, isAfter, parse, sub } from "date-fns";
@@ -26,6 +26,8 @@ import {
 } from "@/services/helper";
 
 import PreviewTimesheet from "@/pages/Timesheet/MonthlyTimesheet/partials/PreviewTimesheet";
+import LeaveRequestApi from "@/apis/v1/LeaveApi/LeaveRequestApi";
+import LeaveTypeControl from "./LeaveTypeControl";
 
 const DateTimesheetControl = () => {
 	const { watch, setValue } = useFormContext();
@@ -44,7 +46,7 @@ const DateTimesheetControl = () => {
 	const parseTime = (timeStr) => {
 		if (!timeStr) return null;
 		try {
-			return parse(timeStr, "HH:mm", new Date());
+			return parse(timeStr, new Date());
 		} catch {
 			return null;
 		}
@@ -111,7 +113,7 @@ const DateTimesheetControl = () => {
 
 					if (isSameDay && start && end && !isAfter(end, start)) {
 						const adjusted = add(start, { minutes: 30 });
-						setValue("end_time_at", format(adjusted, "HH:mm"));
+						setValue("end_time_at");
 					}
 				}}
 				calendarProps={{
@@ -128,8 +130,8 @@ const DateTimesheetControl = () => {
 					startTimeAt &&
 					endTimeAt &&
 					calculateTimeDifferenceDays(
-						parse(`${safeFormat(startDateAt)} ${startTimeAt}`, "dd/MM/yyyy HH:mm", new Date()),
-						parse(`${safeFormat(endDateAt)} ${endTimeAt}`, "dd/MM/yyyy HH:mm", new Date()),
+						parse(`${safeFormat(startDateAt)} ${startTimeAt}`, "dd/MM/yyyy", new Date()),
+						parse(`${safeFormat(endDateAt)} ${endTimeAt}`, "dd/MM/yyyy", new Date()),
 					)}
 			</span>
 		</div>
@@ -138,7 +140,7 @@ const DateTimesheetControl = () => {
 
 const DetailRequest = ({
 	handleFormOpen = () => {},
-	state: { state, type, event },
+	state: { state, type, event, data },
 }) => {
 	const [detailState, setDetailState] = useState({
 		state,
@@ -146,14 +148,16 @@ const DetailRequest = ({
 		event,
 	});
 
+    const [leaveRequestData] = useState({
+        data
+    });
+
 	const queryClient = useQueryClient();
 
 	const { onSubmit: onSubmitTimesheet, isLoading: isLoadingSubmitTimesheet } =
 		useCustomMutation({
 			api:
-				type === 0
-					? MonthlyTimesheetApi.addTimesheet
-					: MonthlyTimesheetApi.updateTimesheet,
+				LeaveRequestApi.approveLeaveRequest,
 			onSuccess: (res) => {
 				queryClient.setQueryData(["timesheetThisMonth"], {
 					data: res.data,
@@ -182,29 +186,33 @@ const DetailRequest = ({
 		);
 	}
 
+    const safeFormat = (date, dateFormat = "dd/MM/yyyy") => {
+		try {
+			return format(date, dateFormat);
+		} catch {
+			return "";
+		}
+	};
+
 	const handleSubmit = (data, e) => {
 		const payload = {
-			start_at: format(
+			start_at: safeFormat(
 				add(
 					parse(
-						format(data.start_date_at, "yyyy-MM-dd") + " " + data.start_time_at,
-						"yyyy-MM-dd HH:mm",
+						safeFormat(data.start_date_at) + " " + data.start_time_at,
 						new Date(),
 					),
 					{ hours: getUTCOffsetInHours(data.timezone) },
 				),
-				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
 			),
-			end_at: format(
+			end_at: safeFormat(
 				add(
 					parse(
-						format(data.end_date_at, "yyyy-MM-dd") + " " + data.end_time_at,
-						"yyyy-MM-dd HH:mm",
+						safeFormat(data.end_date_at) + " " + data.end_time_at,
 						new Date(),
 					),
 					{ hours: getUTCOffsetInHours(data.timezone) },
 				),
-				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
 			),
 			title: data.title,
 			timezone: data.timezone,
@@ -216,74 +224,67 @@ const DetailRequest = ({
 		if (detailState.type === 0 && type !== 0) {
 			payload.id = state.id;
 		}
-
+        
 		onSubmitTimesheet(payload, e);
 	};
+
+    useEffect(()=>{
+        console.log(leaveRequestData);
+        
+    })
 
 	return (
 		<>
 			<HookFormProvider
-				defaultValues={{
-					title: type === 0 ? null : state.title,
-					start_date_at:
-						type === 0 ? state?.startDateAt || new Date() : state.startDateAt,
-					start_time_at:
-						type === 0
-							? state?.startTimeAt || format(getNearest30Minutes(), "HH:mm")
-							: state.startTimeAt,
-					end_date_at:
-						type === 0 ? state?.endDateAt || new Date() : state.endDateAt,
-					end_time_at:
-						type === 0
-							? state?.endTimeAt ||
-								format(add(getNearest30Minutes(), { minutes: 30 }), "HH:mm")
-							: state.endTimeAt,
-					description: type === 0 ? null : state.description,
-					client_project_id: type === 0 ? null : state.clientProjectId || null,
-					timezone:
-						type === 0
-							? state?.timezone ||
-								Intl.DateTimeFormat().resolvedOptions().timeZone
-							: state.timezone,
-				}}
+				// defaultValues={{
+				// 	title: type === 0 ? null : state.title,
+				// 	start_date_at:
+				// 		type === 0 ? state?.startDateAt || new Date() : state.startDateAt,
+				// 	start_time_at:
+				// 		type === 0
+				// 			? state?.startTimeAt || safeFormat(getNearest30Minutes())
+				// 			: state.startTimeAt,
+				// 	end_date_at:
+				// 		type === 0 ? state?.endDateAt || new Date() : state.endDateAt,
+				// 	end_time_at:
+				// 		type === 0
+				// 			? state?.endTimeAt ||
+				// 				safeFormat(add(getNearest30Minutes(), { minutes: 30 }))
+				// 			: state.endTimeAt,
+				// 	description: type === 0 ? null : state.description,
+				// 	client_project_id: type === 0 ? null : state.clientProjectId || null,
+				// 	timezone:
+				// 		type === 0
+				// 			? state?.timezone ||
+				// 				Intl.DateTimeFormat().resolvedOptions().timeZone
+				// 			: state.timezone,
+				// }}
 				schema={TimesheetSchema}
 				onSubmit={handleSubmit}
 				className="flex-grow"
 			>
-				<InputControl
-					placeholder={"Title"}
-					name={"title"}
-					leftAddOn={
-						<span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
-							<Pencil className="size-4" />
-						</span>
-					}
-					className="peer pl-10"
-				/>
-				<div className="my-2 flex flex-col gap-2">
-					<span className="font-medium">Type</span>
-                    <SelectControl
-                        name={"timezone"}
-                        options={getTimeZones()}
-                        className={"my-2"}
-                    />
-				</div>
+                <div className="my-2 flex flex-col gap-2">
+					<span className="font-medium">Name</span>
+					<span className="inline-block rounded border border-black-400 bg-black-50 px-3 py-1 text-sm font-medium text-black">{leaveRequestData?.data?.user?.name}</span>
+                </div>
+                <div className="my-2 flex flex-col gap-2">
+					<span className="font-medium">Leave Type</span>
+					<span className="inline-block rounded border border-black-400 bg-black-50 px-3 py-1 text-sm font-medium text-black">{leaveRequestData?.data?.leaveType?.name}</span>
+                </div>
 				<div className="my-2 flex flex-col gap-2">
 					<span className="font-medium">Time</span>
-					<DateTimesheetControl />
+                    <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
+                    <span className="rounded border border-gray-300 bg-gray-50 px-3 py-1 text-sm text-gray-800">
+                        Start : {leaveRequestData?.data?.startDate ? format(new Date(leaveRequestData.data.startDate), "dd-MM-yyyy") : "-"}
+                    </span>
+                    <span className="rounded border border-gray-300 bg-gray-50 px-3 py-1 text-sm text-gray-800">
+                        End : {leaveRequestData?.data?.endDate ? format(new Date(leaveRequestData.data.endDate), "dd-MM-yyyy") : "-"}
+                    </span>
+                    </div>
 				</div>
 				<div className="my-2 flex flex-col gap-2">
 					<span className="font-medium">Description</span>
-                    <InputControl
-                        placeholder={"Description"}
-                        name={"description"}
-                        leftAddOn={
-                            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
-                                <Pencil className="size-4" />
-                            </span>
-                        }
-                    className="peer pl-10"
-                    />
+					<span className="inline-block rounded border border-black-400 bg-black-50 px-3 py-1 text-sm font-medium text-black">{leaveRequestData?.data?.description}</span>
                 </div>
 				<div className="mt-3 flex justify-end gap-2">
 					<Button

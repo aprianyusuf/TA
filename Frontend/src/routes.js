@@ -2,33 +2,34 @@ import { lazy } from "react";
 
 import ClockInOut from "./pages/Leave/ClockInOut/ClockInOut";
 import LeaveRequest from "./pages/Leave/Request/LeaveRequest";
+import Salary from "./pages/Payroll/Salary/Salary";
 
 export const ROUTE_MASTER = [
-	{
-		Component: lazy(() => import("@/pages/Master/Organization/Organization")),
-		path: "organization",
-		menu: "SYS00001",
-		isLazy: true,
-		title: "Organization",
-		fullPath: "/master/organization",
-		isNavbar: true,
-	},
-	{
-		Component: lazy(
-			() => import("@/pages/Master/Organization/AddOrganization"),
-		),
-		path: "organization/add",
-		menu: "SYS00003",
-		isLazy: true,
-	},
-	{
-		Component: lazy(
-			() => import("@/pages/Master/Organization/EditOrganization"),
-		),
-		path: "organization/edit/:id",
-		menu: "SYS00004",
-		isLazy: true,
-	},
+	// {
+	// 	Component: lazy(() => import("@/pages/Master/Organization/Organization")),
+	// 	path: "organization",
+	// 	menu: "SYS00001",
+	// 	isLazy: true,
+	// 	title: "Organization",
+	// 	fullPath: "/master/organization",
+	// 	isNavbar: true,
+	// },
+	// {
+	// 	Component: lazy(
+	// 		() => import("@/pages/Master/Organization/AddOrganization"),
+	// 	),
+	// 	path: "organization/add",
+	// 	menu: "SYS00003",
+	// 	isLazy: true,
+	// },
+	// {
+	// 	Component: lazy(
+	// 		() => import("@/pages/Master/Organization/EditOrganization"),
+	// 	),
+	// 	path: "organization/edit/:id",
+	// 	menu: "SYS00004",
+	// 	isLazy: true,
+	// },
 	{
 		Component: lazy(() => import("@/pages/Master/Position/Position")),
 		path: "position",
@@ -91,6 +92,17 @@ export const ROUTE_LEAVE = [
 		isNavbar: true,
 	},
 ];
+
+// export const ROUTE_PAYROLL = [
+// 	{
+// 		Component: Salary,
+// 		path: "salary",
+// 		menu: true,
+// 		title: "Salary",
+// 		fullPath: "/payroll/salary",
+// 		isNavbar: true,
+// 	},
+// ];
 
 export const ROUTE_PROJECT_MANAGEMENT = [
 	{
@@ -183,15 +195,15 @@ export const ROUTE_PROJECT = [
 ];
 
 export const ROUTE_TIMESHEET = [
-	{
-		Component: lazy(
-			() => import("@/pages/Timesheet/MonthlyTimesheet/MonthlyTimesheet"),
-		),
-		path: "/",
-		menu: true,
-		isLazy: true,
-		title: "Timesheet",
-		fullPath: "/timesheet",
-		isNavbar: true,
-	},
+	// {
+	// 	Component: lazy(
+	// 		() => import("@/pages/Timesheet/MonthlyTimesheet/MonthlyTimesheet"),
+	// 	),
+	// 	path: "/",
+	// 	menu: true,
+	// 	isLazy: true,
+	// 	title: "Timesheet",
+	// 	fullPath: "/timesheet",
+	// 	isNavbar: true,
+	// },
 ];

@@ -60,7 +60,7 @@ const LeaveRequest = () => {
 		queryKey: "leave-request",
 	});
 
-    const userPosition = useBoundStore((state)=>state.user.position.name);
+    const userPosition = useBoundStore((state)=>state.user?.position?.name ?? '');
 
     const columns = useMemo(
         () => [
@@ -92,12 +92,20 @@ const LeaveRequest = () => {
                 columnHelper.accessor("startDate", {
                     header: <TableHeader>Start</TableHeader>,
                     width: "w-44",
-                    cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
+                    cell: ({ getValue }) => {
+                        const rawDate = getValue();
+                        const formattedDate = rawDate ? format(new Date(rawDate), "dd-MM-yyyy") : "-";
+                        return <TableCell>{formattedDate}</TableCell>;
+                    },
                 }),
                 columnHelper.accessor("endDate", {
                     header: <TableHeader>End</TableHeader>,
                     width: "w-44",
-                    cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
+                    cell: ({ getValue }) => {
+                        const rawDate = getValue();
+                        const formattedDate = rawDate ? format(new Date(rawDate), "dd-MM-yyyy") : "-";
+                        return <TableCell>{formattedDate}</TableCell>;
+                    },
                 }),
                 columnHelper.accessor("status", {
                     header: <TableHeader>Status</TableHeader>,
@@ -116,6 +124,7 @@ const LeaveRequest = () => {
                                             isOpen: true,
                                             type: 0,
                                             state: {},
+                                            data:original,
                                         }))
                                     }
                                 >
@@ -202,7 +211,7 @@ const LeaveRequest = () => {
                 const start = format(
                     parse(
                         `${year}-${month.toString().padStart(2, "0")}-${date.toString().padStart(2, "0")}`,
-                        "yyyy-MM-dd",
+                        "dd-MM-yyyy",
                         new Date(),
                     ),
                     "dd MMM yyyy",
@@ -210,7 +219,7 @@ const LeaveRequest = () => {
                 const end = format(
                     parse(
                         `${endYear}-${endMonth.toString().padStart(2, "0")}-${endDate.toString().padStart(2, "0")}`,
-                        "yyyy-MM-dd",
+                        "dd-MM-yyyy",
                         new Date(),
                     ),
                     "dd MMM yyyy",
@@ -381,7 +390,7 @@ const LeaveRequest = () => {
                         </div>
                     </div>
                     <span>
-                        {selectedDateRangeText || format(new Date(), "cccc, dd MMMM yyyy")}
+                        {selectedDateRangeText || format(new Date(), "dd-MM-yyyy")}
                     </span>
 					<Table
 						columns={columns}

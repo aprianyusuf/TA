@@ -27,6 +27,8 @@ import {
 } from "@/services/helper";
 
 import PreviewTimesheet from "@/pages/Timesheet/MonthlyTimesheet/partials/PreviewTimesheet";
+import LeaveTypeControl from "./LeaveTypeControl";
+import LeaveTypeApi from "@/apis/v1/LeaveApi/LeaveTypeApi";
 
 const DateTimesheetControl = () => {
 	const { watch, setValue } = useFormContext();
@@ -37,7 +39,6 @@ const DateTimesheetControl = () => {
 		"end_date_at",
 		"end_time_at",
 	]);
-
 	const now = new Date();
 	const earliestDate = sub(now, { months: 1 });
 	const latestDate = add(now, { months: 1 });
@@ -190,9 +191,9 @@ const ModalRequest = ({
 						"yyyy-MM-dd HH:mm",
 						new Date(),
 					),
-					{ hours: getUTCOffsetInHours(data.timezone) },
+					// { hours: getUTCOffsetInHours(data.timezone) },
 				),
-				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+				"yyyy-MM-dd",
 			),
 			end_at: format(
 				add(
@@ -201,14 +202,11 @@ const ModalRequest = ({
 						"yyyy-MM-dd HH:mm",
 						new Date(),
 					),
-					{ hours: getUTCOffsetInHours(data.timezone) },
+					// { hours: getUTCOffsetInHours(data.timezone) },
 				),
-				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+				"yyyy-MM-dd",
 			),
-			title: data.title,
-			timezone: data.timezone,
 			description: "test",
-			client_project_id: data.client_project_id,
 			status: e.nativeEvent.submitter.value === "submit" ? 1 : 0,
 		};
 
@@ -223,56 +221,25 @@ const ModalRequest = ({
 		<>
 			<HookFormProvider
 				defaultValues={{
-					title: type === 0 ? null : state.title,
 					start_date_at:
 						type === 0 ? state?.startDateAt || new Date() : state.startDateAt,
-					start_time_at:
-						type === 0
-							? state?.startTimeAt || format(getNearest30Minutes(), "HH:mm")
-							: state.startTimeAt,
 					end_date_at:
 						type === 0 ? state?.endDateAt || new Date() : state.endDateAt,
-					end_time_at:
-						type === 0
-							? state?.endTimeAt ||
-								format(add(getNearest30Minutes(), { minutes: 30 }), "HH:mm")
-							: state.endTimeAt,
 					description: type === 0 ? null : state.description,
-					client_project_id: type === 0 ? null : state.clientProjectId || null,
-					timezone:
-						type === 0
-							? state?.timezone ||
-								Intl.DateTimeFormat().resolvedOptions().timeZone
-							: state.timezone,
 				}}
 				schema={TimesheetSchema}
 				onSubmit={handleSubmit}
 				className="flex-grow"
 			>
-				<InputControl
-					placeholder={"Title"}
-					name={"title"}
-					leftAddOn={
-						<span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
-							<Pencil className="size-4" />
-						</span>
-					}
-					className="peer pl-10"
-				/>
 				<div className="my-2 flex flex-col gap-2">
-					<span className="font-medium">Type</span>
-                    <SelectControl
-                        name={"timezone"}
-                        options={getTimeZones()}
-                        className={"my-2"}
-                    />
+                    <LeaveTypeControl />
 				</div>
 				<div className="my-2 flex flex-col gap-2">
-					<span className="font-medium">Time</span>
+					<span className="font-normal">Time</span>
 					<DateTimesheetControl />
 				</div>
 				<div className="my-2 flex flex-col gap-2">
-					<span className="font-medium">Description</span>
+					<span className="font-normal">Description</span>
                     <InputControl
                         placeholder={"Description"}
                         name={"description"}
@@ -286,6 +253,7 @@ const ModalRequest = ({
                 </div>
 				<div className="mt-3 flex justify-end gap-2">
 					<Button
+						type="submit"
 						disabled={isLoadingSubmitTimesheet}
 						className="w-36"
 						value="submit"

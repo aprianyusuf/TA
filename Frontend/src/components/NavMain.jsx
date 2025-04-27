@@ -25,6 +25,7 @@ import {
 import {
 	ROUTE_LEAVE,
 	ROUTE_MASTER,
+	// ROUTE_PAYROLL,
 	ROUTE_PROJECT_MANAGEMENT,
 	ROUTE_TIMESHEET,
 } from "@/routes";
@@ -110,7 +111,7 @@ export function NavMain() {
 						</SidebarMenuItem>
 					</Collapsible>
 				) : null}
-				{ROUTE_TIMESHEET.filter(
+				{/* {ROUTE_TIMESHEET.filter(
 					(v) => (permission.includes(v.menu) || v.menu === true) && v.isNavbar,
 				).length > 0 ? (
 					<Collapsible
@@ -179,7 +180,42 @@ export function NavMain() {
 							</CollapsibleContent>
 						</SidebarMenuItem>
 					</Collapsible>
-				) : null}
+				) : null} */}
+				{/* {ROUTE_PAYROLL.filter(
+					(v) => (permission.includes(v.menu) || v.menu === true) && v.isNavbar,
+				).length > 0 ? (
+					<Collapsible
+						key={"Payroll"}
+						asChild
+						defaultOpen={true}
+						className="group/collapsible"
+					>
+						<SidebarMenuItem>
+							<CollapsibleTrigger asChild>
+								<SidebarMenuButton tooltip={"Payroll"}>
+									<FileBox />
+									<span>Payroll</span>
+									<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+								</SidebarMenuButton>
+							</CollapsibleTrigger>
+							<CollapsibleContent>
+								<SidebarMenuSub>
+									{ROUTE_PAYROLL.filter(
+										(v) =>
+											(permission.includes(v.menu) || v.menu === true) &&
+											v.isNavbar,
+									).map(({ title, fullPath }) => (
+										<SidebarMenuSubItem key={title}>
+											<SidebarMenuSubButton asChild>
+												<Link to={fullPath}>{title}</Link>
+											</SidebarMenuSubButton>
+										</SidebarMenuSubItem>
+									))}
+								</SidebarMenuSub>
+							</CollapsibleContent>
+						</SidebarMenuItem>
+					</Collapsible>
+				) : null} */}
 			</SidebarMenu>
 		</SidebarGroup>
 	);
