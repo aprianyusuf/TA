@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class OrganizationService
@@ -134,13 +135,15 @@ class OrganizationService
             ])
             ->join('permissions as p', 'po.permission_id', '=', 'p.id')
             ->join('modules as m', 'p.module_id', '=', 'm.id')
-            ->where('po.organization_id', '=', $request->decoded->get('organization')?->get('id'));
+            ->where('po.organization_id', '=', $request->decoded->get('organization')?->get('id'))
+            ->whereNotIn('m.name', ['System', 'Project Management']);
 
         if ($request->search) {
             $query->whereRaw("p.name ILIKE ?", ["%{$request->search}%"]);
         }
 
         $query = $query->orderBy('p.id')->get();
+        Log::info('create employee permissions:', [$query]);
 
         return [PermissionResource::collection($query), $query->count()];
     }

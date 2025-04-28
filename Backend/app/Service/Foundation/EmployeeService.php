@@ -126,11 +126,27 @@ class EmployeeService
             ->get();
     }
 
-    public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = '')
-    {
-        $fn = StoredProcedure::FnGetUsersPositionInHierarchy;
-        return DB::select("select * from {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
-    }
+    public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = null)
+{
+    $fn = 'sp_get_users_position_in_hierarchy'; // harusnya ini isinya "sp_get_users_position_in_hierarchy"
+
+    $search = $search !== '' ? $search : null;
+
+    return DB::select("CALL {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
+}
+
+
+//     public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = null)
+// {
+//     $fn = StoredProcedure::FnGetUsersPositionInHierarchyMysql;
+
+//     // Kalau kosong string, ubah jadi NULL supaya SQL tidak error
+//     $search = $search !== '' ? $search : null;
+
+    // return DB::select("select * from {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
+    
+// }
+
 
     public function createEmployee(StoreEmployeeRequest $storeEmployeeRequest)
     {
