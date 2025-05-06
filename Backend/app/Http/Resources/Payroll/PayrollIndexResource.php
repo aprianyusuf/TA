@@ -42,12 +42,12 @@ class PayrollIndexResource extends JsonResource
             'net_pay'           => number_format($this->net_pay, 2, '.', ''),
             'currency'          => $this->currency,
             'status'            => $this->status,
-            'payroll_period'    => [
-                'id'   => $this->payroll_period_id,
-                'start_date' => $this->payroll_period->start_date,
-                'end_date'   => $this->payroll_period->end_date,
-                ''
-            ]
+            // 'payroll_period'    => [
+            //     'id'   => $this->payroll_period_id,
+            //     'start_date' => $this->payroll_period->start_date,
+            //     'end_date'   => $this->payroll_period->end_date,
+            //     ''
+            // ]
         ];
     }
 }

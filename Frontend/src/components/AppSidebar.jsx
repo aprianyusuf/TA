@@ -12,18 +12,17 @@ import {
 } from "@/components/ui/Sidebar";
 
 import SidebarSwitcher from "./SidebarSwitcher";
+import logo from '@/assets/logo_msp.png';
 
 export function AppSidebar({ ...props }) {
 	return (
 		<Sidebar collapsible="offcanvas" variant="sidebar" {...props}>
-			<SidebarHeader className="px-2 pb-0 pt-2">
-				{/* <Link to={"/"}>
-					<img
-						alt="logo-organization"
-						src="https://rootdigitaltechnology.com/images/logo/Logo-01.png"
-						className="w-28 object-contain"
-					/>
-				</Link> */}
+			<SidebarHeader className="flex justify-center items-center px-2 pb-0 pt-2">
+				<img
+					alt="logo-organization"
+					src={logo}
+					className="w-40 object-contain"
+				/>
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarSwitcher />

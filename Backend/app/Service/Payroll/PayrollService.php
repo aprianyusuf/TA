@@ -53,7 +53,10 @@ class PayrollService
                 'e.salary as salary',
             ]);
         $count = $query->count('p.id');
-        $data  = $query->get()->map(function ($payroll) {
+        $data  = $query
+            ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
+            ->limit($request->get('size', 10))
+        ->get()->map(function ($payroll) {
             $query = DB::table('payroll_bonuses as pb')
                 ->where('pb.payroll_id', '=', $payroll->id)
                 ->join('payroll_bonus_types as pbt', 'pbt.id', '=', 'pb.payroll_bonus_type_id')

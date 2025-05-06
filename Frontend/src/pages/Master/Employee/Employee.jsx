@@ -112,16 +112,17 @@ const Employee = () => {
 	return (
 		<>
 			<Tabs defaultValue="table" className="flex h-full w-full flex-col">
-				<TabsList className="w-fit">
+				{/* <TabsList className="w-fit">
 					<TabsTrigger value="table" className="w-32">
 						List
 					</TabsTrigger>
 					<TabsTrigger value="hierarchy" className="w-32">
 						Hierarchy
 					</TabsTrigger>
-				</TabsList>
+				</TabsList> */}
 				<TabsContent value="table">
-					<div className="mb-4 flex justify-end">
+					<div className="mb-4 flex items-center justify-between">
+						<h2 className="text-xl font-bold ml-5">Employee Management</h2>
 						<Button asChild title="Add Employee">
 							<Link to={"add"}>
 								<Plus size={16} className="mr-2" />

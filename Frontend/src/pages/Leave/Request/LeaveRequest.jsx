@@ -313,9 +313,8 @@ const LeaveRequest = () => {
 		<>
 			<Tabs defaultValue="table" className="flex h-full w-full flex-col">
 				<TabsContent value="table">
-                    <div className="flex justify-between">
-                        <div className="flex flex-col items-center gap-2 md:flex-row">
-                        </div>
+                    <div className="flex items-center justify-between">
+					    <h2 className="text-xl font-bold ml-5">Leave Request</h2>
                         <div className="flex flex-col gap-2 md:flex-row">
                             <Button
                                 onClick={() =>

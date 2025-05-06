@@ -8,6 +8,7 @@ import { Edit, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import EmployeeApi from "@/apis/v1/MasterApi/EmployeeApi";
+import PayrollApi from "@/apis/v1/PayrollApi/PayrollApi";
 import {
 	DeleteRow,
 	Table,
@@ -25,7 +26,7 @@ const columnHelper = createColumnHelper();
 
 const Employee = () => {
 	const { data, isLoading, pagination, setPagination } = useDataTable({
-		api: EmployeeApi.getAll,
+		api: PayrollApi.getAll,
 		queryKey: "employees",
 	});
 
@@ -48,32 +49,11 @@ const Employee = () => {
 					width: "w-44",
 					cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
 				}),
-				// columnHelper.accessor("email", {
-				// 	header: <TableHeader>Email</TableHeader>,
-				// 	width: "w-44",
-				// 	cell: ({ getValue }) => (
-				// 		<TableCell className="w-44 truncate" title={getValue()}>
-				// 			{getValue()}
-				// 		</TableCell>
-				// 	),
-				// }),
 				columnHelper.accessor("position", {
 					header: <TableHeader>Position</TableHeader>,
 					width: "w-44",
 					cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
 				}),
-				// columnHelper.accessor("superior", {
-				// 	header: <TableHeader>Superior</TableHeader>,
-				// 	width: "w-44",
-				// 	cell: ({ row: { original } }) => (
-				// 		<TableCell>
-				// 			{original.superiorName}{" "}
-				// 			{original.superiorPosition
-				// 				? ` (${original.superiorPosition})`
-				// 				: "-"}
-				// 		</TableCell>
-				// 	),
-				// }),
 				columnHelper.accessor("createdBy", {
 					header: <TableHeader>Salary</TableHeader>,
 					width: "w-44",

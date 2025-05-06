@@ -87,7 +87,8 @@ const Position = () => {
 	return (
 		<>
 			{isUserCan("MD00008") ? (
-				<div className="mb-4 flex justify-end">
+				<div className="mb-4 flex items-center justify-between">
+					<h2 className="text-xl font-bold ml-5">Position Management</h2>
 					<Button asChild title="Add Position">
 						<Link to={"add"}>
 							<Plus size={16} className="mr-2" />

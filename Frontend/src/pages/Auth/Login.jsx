@@ -14,6 +14,8 @@ import { useCustomMutation } from "@/hooks/useCustomMutation";
 import HookFormProvider from "@/providers/HookFormProvider";
 import { AuthLoginRequest } from "@/schema/request/AuthRequest";
 import { useBoundStore } from "@/stores";
+import logo from '@/assets/logo_msp.png';
+
 
 const Login = () => {
 	const navigate = useNavigate();
@@ -63,13 +65,11 @@ const Login = () => {
 							className="flex flex-col gap-4"
 							onSubmit={onSubmitLogin}
 						>
-							{/* <img
-								src={
-									"https://rootdigitaltechnology.com/images/logo/Logo-01.png"
-								}
-								alt="logo-rdt"
-								className="w-40 object-contain"
-							/> */}
+							<img
+								src={logo}
+								alt="logo-msp"
+								className="w-80 object-contain mx-auto"
+							/>
 							<h2 className="text-xl font-bold text-center">Selamat Datang, Silahkan Login !</h2>
 							<InputControl
 								label="Email"
