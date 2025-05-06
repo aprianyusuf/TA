@@ -1,0 +1,52 @@
+<?php
+namespace App\Http\Controllers\API\V1\Payroll;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Payroll\PayrollPeriodIndexResource;
+use App\Service\Payroll\PayrollPeriodService;
+use Illuminate\Http\Request;
+
+class PayrollPeriodApiController extends Controller
+{
+    /**
+     * @group Payroll
+     *
+     */
+    protected PayrollPeriodService $payrollPeriodService;
+
+    public function __construct(PayrollPeriodService $payrollPeriodService)
+    {
+        $this->payrollPeriodService = $payrollPeriodService;
+    }
+
+    /**
+     * List Payroll Periods
+     */
+    public function index(Request $request)
+    {
+        $request->validate(
+            [
+                /**
+                 * @default 10
+                 */
+                'size' => ['int'],
+                /**
+                 * @default 1
+                 */
+                'page' => ['int'],
+            ]
+        );
+        [$data, $count] = $this->payrollPeriodService->getData($request);
+        /**
+         * @status 200
+         * @body array[status: string, code: int, data PayrollPeriodIndexResource[]], count: int
+         */
+        return $this->successResponse(data: PayrollPeriodIndexResource::collection($data), optionalResponses: ['count' => $count]);
+    }
+
+    public function show(Request $request, $payrollPeriodId)
+    {
+        [$data, $count] = $this->payrollPeriodService->getData($request, $payrollPeriodId);
+        return $this->successResponse(data: $data, optionalResponses: ['count' => $count]);
+    }
+}

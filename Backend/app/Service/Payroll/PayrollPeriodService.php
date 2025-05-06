@@ -1,88 +1,67 @@
 <?php
 namespace App\Service\Payroll;
 
-use App\Utils\Enums\PayrollBonusTypeEnum;
+use App\Utils\Enums\PayrollStatusEnum;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class PayrollService
+class PayrollPeriodService
 {
+    protected PayrollService $payrollService;
     /**
      * Create a new class instance.
      */
-    public function __construct()
+    public function __construct(PayrollService $payrollService)
     {
-        //
+        $this->payrollService = $payrollService;
     }
 
-    public function getData(Request $request, string $id = null)
+    public function getData(Request $request, $payrollPeriodId = null)
     {
-        $auth  = $request->decoded;
-        $query = DB::table('payrolls as p')
-            ->join('employees as e', 'e.id', '=', 'p.employee_id')
-            ->join('users as u', 'u.id', '=', 'e.user_id')
-            ->join('payroll_periods as pp', function (JoinClause $join) {
-                $join->on('pp.id', '=', 'p.payroll_period_id')
-                    ->join('organizations as o', 'o.id', '=', 'pp.organization_id');
+        $auth = $request->decoded;
+
+        $statusCounts = $this->generateStatusCountExpressions();
+
+        $query = DB::table('payroll_periods as pp')
+            ->leftJoin('payrolls as p', fn($join) => $join->on('pp.id', '=', 'p.payroll_period_id'))
+            ->leftJoin('employees as e', 'e.id', '=', 'p.employee_id')
+            ->where('pp.organization_id', $auth['organization']['id'])
+            ->when($payrollPeriodId, fn($q) => $q->where('pp.id', $payrollPeriodId))
+            ->groupBy('pp.id', 'pp.start_at', 'pp.end_at', 'pp.payroll_at', 'pp.year', 'pp.month')
+            ->select(array_merge([
+                'pp.id',
+                'pp.start_at as period_start_at',
+                'pp.end_at as period_end_at',
+                'pp.payroll_at',
+                'pp.year',
+                'pp.month',
+                DB::raw('COUNT(p.id) as payroll_total'),
+                DB::raw('SUM(p.net_pay) as total_net_pay'),
+            ], $statusCounts));
+
+        $data = $query
+            ->when(! is_null($payrollPeriodId), function ($subQuery) use($request) {
+                $subQuery->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
+                    ->limit($request->get('size', 10));
             })
-            ->when($request->get('period_id'), function ($query) use ($request) {
-                $query->where('p.payroll_period_id', $request->get('period_id'));
-            })
-            ->when($request->get('employee_id'), function ($query) use ($request) {
-                $query->where('e.id', $request->get('employee_id'));
-            })
-            ->select([
-                'p.id',
-                'p.salary',
-                'p.created_at',
-                'p.updated_at',
-                'p.status',
-                'p.bonus',
-                'p.deduction',
-                'p.net_pay',
-                'p.currency',
-                'p.payroll_period_id as payroll_period_id',
-                'u.first_name as first_name',
-                'u.last_name as last_name',
-                'u.email as email',
-                'o.name as organization_name',
-                'o.id as organization_id',
-                'e.id as employee_id',
-                'e.salary as salary',
-            ]);
-        $count = $query->count('p.id');
-        $data  = $query
-            ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
-            ->limit($request->get('size', 10))
-            ->get()->map(function ($payroll) {
-            $query = DB::table('payroll_bonuses as pb')
-                ->where('pb.payroll_id', '=', $payroll->id)
-                ->join('payroll_bonus_types as pbt', 'pbt.id', '=', 'pb.payroll_bonus_type_id')
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
-                ->select([
-                    'pb.id as id',
-                    'pb.value as value',
-                    'pbt.name as type',
-                ]);
-            $payroll->bonuses = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Bonus->value)
-                ->get();
-            $payroll->bonus_value = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Bonus->value)
-                ->sum('pb.value');
-            $payroll->deductions = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
-                ->get();
-            $payroll->deduction_value = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
-                ->sum('pb.value');
-            $payroll->net_pay = $payroll->salary + $payroll->bonus_value - $payroll->deduction_value;
-            return $payroll;
-        });
+            ->get();
+        $count = $data->count();
 
         return [$data, $count];
+    }
+
+    private function generateStatusCountExpressions(): array
+    {
+        $expressions = [];
+
+        foreach (PayrollStatusEnum::cases() as $status) {
+            $alias         = 'total_' . strtolower($status->name);
+            $expressions[] = DB::raw("SUM(CASE WHEN p.status = {$status->value} THEN 1 ELSE 0 END) as {$alias}");
+        }
+
+        return $expressions;
     }
 
     public function getPayrollsByPeriod(Request $request)
