@@ -1,23 +1,24 @@
 <?php
 
-use App\Http\Controllers\API\V1\Authentication\AuthenticationApiController;
-use App\Http\Controllers\API\V1\Foundation\EmployeeApiController;
+use Dedoc\Scramble\Scramble;
+use Illuminate\Http\Request;
+use Dedoc\Scramble\Generator;
+use Illuminate\Support\Facades\Route;
+use App\Middleware\PermissionConstant;
+use App\Middleware\EnsureUserHasPermission;
+use App\Middleware\AuthenticationMiddleware;
 use App\Http\Controllers\API\V1\Foundation\FileApiController;
-use App\Http\Controllers\API\V1\Foundation\OrganizationApiController;
-use App\Http\Controllers\API\V1\Foundation\PositionApiController;
+use App\Http\Controllers\API\V1\Leave\LeaveTypeApiController;
+use App\Http\Controllers\API\V1\Payroll\PayrollApiController;
 use App\Http\Controllers\API\V1\Leave\AttendanceApiController;
 use App\Http\Controllers\API\V1\Leave\LeaveRequestApiController;
-use App\Http\Controllers\API\V1\Leave\LeaveTypeApiController;
+use App\Http\Controllers\API\V1\Foundation\EmployeeApiController;
+use App\Http\Controllers\API\V1\Foundation\PositionApiController;
+use App\Http\Controllers\API\V1\Foundation\OrganizationApiController;
 use App\Http\Controllers\API\V1\ProjectManagement\ClientApiController;
 use App\Http\Controllers\API\V1\ProjectManagement\ProjectApiController;
 use App\Http\Controllers\API\V1\Timesheet\EmployeeTimesheetApiController;
-use App\Middleware\AuthenticationMiddleware;
-use App\Middleware\EnsureUserHasPermission;
-use App\Middleware\PermissionConstant;
-use Dedoc\Scramble\Generator;
-use Dedoc\Scramble\Scramble;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\V1\Authentication\AuthenticationApiController;
 
 Route::prefix('auth')
     ->controller(AuthenticationApiController::class)->group(function () {
@@ -128,6 +129,19 @@ Route::prefix('v1')->group(function () {
             Route::controller(EmployeeTimesheetApiController::class)
                 ->group(function () {
                     Route::get('/configuration', 'timesheetConfiguration');
+                });
+        });
+
+    Route::prefix('payroll')
+        ->group(function () {
+            Route::controller(PayrollApiController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_PAYROLL->value)[0]);
+                    // Route::post('/create', 'store')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::ADD_PAYROLL->value)[0]);
+                    // Route::put('/update/{id}', 'update')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_PAYROLL->value)[0]);
+
+                    // Route::get('/{id}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_PAYROLL->value)[0]);
+                    // Route::delete('/{id}', 'delete')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::DELETE_PAYROLL->value)[0]);
                 });
         });
 

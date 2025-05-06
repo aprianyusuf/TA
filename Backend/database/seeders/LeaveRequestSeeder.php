@@ -1,9 +1,8 @@
 <?php
-
 namespace Database\Seeders;
 
+use App\Models\Foundation\Employee;
 use App\Models\LeaveType;
-use App\Models\User;
 use App\Service\Leave\LeaveRequestService;
 use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
@@ -30,24 +29,33 @@ class LeaveRequestSeeder extends Seeder
             ];
         }
 
-        // Get all users (assuming the User model exists)
-        $users = User::query()->with('organization')->get();
-
+        $employees = DB::table('employees as e')
+            ->join('users as u', 'u.id', '=', 'e.user_id')
+            ->join('organizations as o', 'u.organization_id', '=', 'o.id')
+            ->whereNotNull('u.organization_id')
+            ->where('o.domain', '=', 'mitrasaburaiproperti.com')
+            ->select([
+                'e.id as id',
+                'o.id as organization_id',
+                'u.id as user_id',
+                'u.first_name as first_name',
+                'u.last_name as last_name',
+                'o.domain as organization_domain',
+            ])
+            ->get();
         // Initialize the leave request service
         $leaveService = new LeaveRequestService();
 
-        // Loop through each user to generate leave requests
-        foreach ($users as $user) {
-            if ($user->organization->domain == 'mitrasaburaiproperti.com') {
-                $this->createLeaveRequest($user, $pastYearMonths, $leaveService);
-            }
+        // Loop through each employee to generate leave requests
+        foreach ($employees as $employee) {
+            $this->createLeaveRequest($employee, $pastYearMonths, $leaveService);
         }
     }
 
-    public function createLeaveRequest(User $user, $pastYearMonths, LeaveRequestService $leaveService)
+    public function createLeaveRequest($employee, $pastYearMonths, LeaveRequestService $leaveService)
     {
-        // Retrieve leave types applicable to the user's organization
-        $leaveTypes = LeaveType::where('organization_id', $user->organization_id)->get();
+        // Retrieve leave types applicable to the employee's organization
+        $leaveTypes = LeaveType::where('organization_id', $employee->organization_id)->get();
 
         // Loop over each past month
         foreach ($pastYearMonths as $monthData) {
@@ -77,7 +85,7 @@ class LeaveRequestSeeder extends Seeder
                     // We check from the randomly chosen duration down to 1.
                     for ($d = $duration; $d >= 1; $d--) {
                         $randomEnd  = Carbon::parse($randomStart)->addDays($d - 1)->toDateString();
-                        $validation = $leaveService->canApplyForLeave($user->id, $leaveType, $randomStart, $randomEnd);
+                        $validation = $leaveService->canApplyForLeave($employee->user_id, $leaveType, $randomStart, $randomEnd);
                         if ($validation['valid']) {
                             $validatedDuration = $d;
                             break;
@@ -88,17 +96,18 @@ class LeaveRequestSeeder extends Seeder
                     if ($validatedDuration > 0) {
                         $finalEnd = Carbon::parse($randomStart)->addDays($validatedDuration - 1)->toDateString();
                         DB::table('leave_requests')->insert([
-                            'id'            => Str::ulid(),
-                            'user_id'       => $user->id,
-                            'organization_id' => $user->organization_id,
-                            'leave_type_id' => $leaveType->id,
-                            'start_date'    => $randomStart,
-                            'end_date'      => $finalEnd,
-                            'days'          => $validatedDuration,
-                            'status'        => LeaveRequestStatus::Approved,
-                            'description'   => 'Seeded leave request',
-                            'created_at'    => Carbon::now(),
-                            'updated_at'    => Carbon::now(),
+                            'id'              => Str::ulid(),
+                            'employee_id'     => $employee->id,
+                            'user_id'         => $employee->user_id,
+                            'organization_id' => $employee->organization_id,
+                            'leave_type_id'   => $leaveType->id,
+                            'start_date'      => $randomStart,
+                            'end_date'        => $finalEnd,
+                            'days'            => $validatedDuration,
+                            'status'          => LeaveRequestStatus::Approved,
+                            'description'     => 'Seeded leave request',
+                            'created_at'      => Carbon::now(),
+                            'updated_at'      => Carbon::now(),
                         ]);
                     }
                 }

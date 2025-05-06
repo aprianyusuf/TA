@@ -35,6 +35,12 @@ enum PermissionConstant: string {
     case EDIT_LEAVE_REQUEST = "MD00020|edit_leave_request|4|leave";
     case ABORT_LEAVE_REQUEST = "MD00021|abort_leave_request|4|leave";
 
+    case MENU_PAYROLL = "MD00022|menu_payroll|5|payroll";
+    case SHOW_PAYROLL = "MD00023|show_payroll|5|payroll";
+    case ADD_PAYROLL = "MD00024|add_payroll|5|payroll";
+    case EDIT_PAYROLL = "MD00025|edit_payroll|5|payroll";
+    case DELETE_PAYROLL = "MD00026|delete_payroll|5|payroll";
+
     public static function names(): array
     {
         return array_column(self::cases(), 'name');

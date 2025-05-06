@@ -1,10 +1,10 @@
 <?php
 namespace Database\Seeders;
 
-use Illuminate\Support\Str;
+use App\Models\Foundation\Organization;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Foundation\Organization;
+use Illuminate\Support\Str;
 
 class LeaveTypeSeeder extends Seeder
 {
@@ -74,6 +74,7 @@ class LeaveTypeSeeder extends Seeder
                 'description'       => 'Unpaid leave is a type of leave that allows employees to take time off from work without pay.',
                 'max_days'          => null,
                 'max_days_per_year' => null,
+                'is_paid'           => false,
             ],
         ];
         foreach ($organizations as $organization) {
@@ -81,6 +82,7 @@ class LeaveTypeSeeder extends Seeder
                 $newLeaveType = array_merge($leaveType, [
                     'organization_id' => $organization->id,
                     'id'              => Str::ulid(),
+                    'is_paid'         => $leaveType['is_paid'] ?? true,
                 ]);
                 DB::table('leave_types')->insert($newLeaveType);
             }

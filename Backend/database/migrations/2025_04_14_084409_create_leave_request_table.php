@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreign('organization_id')->references('id')->on('organizations')->cascadeOnDelete();
             $table->char('user_id', 26)->index();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->char('employee_id', 26)->index();
+            $table->foreign('employee_id')->references('id')->on('employees')->cascadeOnDelete();
             $table->char('leave_type_id', 26)->index();
             $table->foreign('leave_type_id')->references('id')->on('leave_types')->cascadeOnDelete();
             $table->date('start_date');

@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\Foundation\Employee;
@@ -34,7 +33,7 @@ class OrganizationSeeder extends Seeder
                     ->get()
                     ->transform(fn($v) => [
                         'organization_id' => $organization->id,
-                        'permission_id' => $v->id
+                        'permission_id'   => $v->id,
                     ])
                     ->toArray();
 
@@ -48,7 +47,7 @@ class OrganizationSeeder extends Seeder
                 DB::table('positions')->insert($position);
 
                 $position_id = DB::query()->from('positions')->where('organization_id', $organization->id)->where('name', 'CEO')->first('id')->id;
-                $position = [
+                $position    = [
                     ['id' => Str::ulid(), 'name' => 'CTO', 'organization_id' => $organization->id, 'position_id' => $position_id],
                     ['id' => Str::ulid(), 'name' => 'COO', 'organization_id' => $organization->id, 'position_id' => $position_id],
                 ];
@@ -57,11 +56,11 @@ class OrganizationSeeder extends Seeder
 
                 $positions = DB::table('positions')->select(['id', 'name'])->where('organization_id', $organization->id)->get();
 
-                $permission_position = array();
+                $permission_position = [];
                 foreach ($positions as $key => $value) {
                     $permission_position = array_merge($permission_position, collect($organization_permission)->transform(fn($v) => [
-                        'position_id' => $value->id,
-                        'permission_id' => $v['permission_id']
+                        'position_id'   => $value->id,
+                        'permission_id' => $v['permission_id'],
                     ])->toArray());
                 }
 
@@ -73,11 +72,11 @@ class OrganizationSeeder extends Seeder
                         ->count(1)
                         ->state(function (array $_) use ($organization, $value, $positions, $key) {
                             return [
-                                'email' => strtolower($value->name) . '+' . explode('.', $organization->domain)[0] . ".{$organization->id}" . '@' . $organization->domain,
+                                'email'                 => strtolower($value->name) . '+' . explode('.', $organization->domain)[0] . ".{$organization->id}" . '@' . $organization->domain,
                                 'is_admin_organization' => true,
-                                'organization_id' => $organization->id,
-                                'position_id' => $value->id,
-                                'report_to_id' => $key != 0 ? User::query()->where('organization_id', $organization->id)->where('position_id', $positions->first()->id)->first('id')->id : null,
+                                'organization_id'       => $organization->id,
+                                'position_id'           => $value->id,
+                                'report_to_id'          => $key != 0 ? User::query()->where('organization_id', $organization->id)->where('position_id', $positions->first()->id)->first('id')->id : null,
                             ];
                         })
                         ->has(

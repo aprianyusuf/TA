@@ -13,6 +13,7 @@
         "dedoc/scramble": "0.11.27",
         "firebase/php-jwt": "^6.10",
         "laravel/framework": "^11.9",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
     },

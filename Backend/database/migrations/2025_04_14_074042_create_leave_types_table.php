@@ -27,6 +27,7 @@ return new class extends Migration
             $table->integer('max_days_per_week')->nullable()->default(null);
             $table->integer('max_days_per_quarter')->nullable()->default(null);
             $table->integer('max_days_per_half_year')->nullable()->default(null);
+            $table->boolean('is_paid')->default(true);
             $table->timestamps();
         });
     }
