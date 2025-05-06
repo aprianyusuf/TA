@@ -44,9 +44,61 @@ class PayrollPeriodApiController extends Controller
         return $this->successResponse(data: PayrollPeriodIndexResource::collection($data), optionalResponses: ['count' => $count]);
     }
 
+    /**
+     * Show Payroll Period
+     */
+
     public function show(Request $request, $payrollPeriodId)
     {
         [$data, $count] = $this->payrollPeriodService->getData($request, $payrollPeriodId);
         return $this->successResponse(data: $data, optionalResponses: ['count' => $count]);
+    }
+
+    /**
+     * Create Payroll Period
+     */
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'start_at' => ['required', 'date'],
+            'end_at' => ['required', 'date'],
+            'payroll_at' => ['required', 'date'],
+            'year' => ['required', 'int'],
+            'month' => ['required', 'int'],
+        ]);
+
+        $data = $this->payrollPeriodService->store($request);
+
+        return $this->successResponse(data: new PayrollPeriodIndexResource($data));
+    }
+
+    /**
+     * Update Payroll Period
+     */
+    public function update(Request $request, $payrollPeriodId)
+    {
+        $request->validate([
+            'start_at' => ['required', 'date'],
+            'end_at' => ['required', 'date'],
+            'payroll_at' => ['required', 'date'],
+            'year' => ['required', 'int'],
+            'month' => ['required', 'int'],
+        ]);
+
+        $data = $this->payrollPeriodService->update($request, $payrollPeriodId);
+
+        return $this->successResponse(data: new PayrollPeriodIndexResource($data));
+    }
+
+    /**
+     * Delete Payroll Period
+     */
+
+    public function destroy(Request $request, $payrollPeriodId)
+    {
+        $this->payrollPeriodService->destroy($request, $payrollPeriodId);
+
+        return $this->successResponse(message: 'Payroll Period Deleted');
     }
 }

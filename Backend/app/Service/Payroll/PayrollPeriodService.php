@@ -64,6 +64,23 @@ class PayrollPeriodService
         return $expressions;
     }
 
+    public function store(Request $request)
+    {
+        $id = Str::ulid();
+
+        DB::table('payroll_periods')->insert([
+            'id'              => $id,
+            'organization_id' => $request->decoded['organization']['id'],
+            'year'            => $request->year,
+            'month'           => $request->month,
+            'start_at'        => $request->start_at,
+            'end_at'          => $request->end_at,
+            'payroll_at'      => $request->payroll_at,
+        ]);
+
+        return DB::table('payroll_periods')->where('id', $id)->first();
+    }
+
     public function getPayrollsByPeriod(Request $request)
     {
         $auth  = $request->decoded;

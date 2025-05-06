@@ -138,6 +138,9 @@ Route::prefix('v1')->group(function () {
             Route::controller(PayrollPeriodApiController::class)
                 ->group(function () {
                     Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_PAYROLL_PERIOD->value)[0]);
+                    Route::post('/create', 'store')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::ADD_PAYROLL_PERIOD->value)[0]);
+                    Route::put('/update/{payrollPeriodId}', 'update')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_PAYROLL_PERIOD->value)[0]);
+                    Route::delete('/{payrollPeriodId}', 'delete')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::DELETE_PAYROLL_PERIOD->value)[0]);
                     Route::prefix('{payrollPeriodId}')->group(function () {
                         Route::get('/', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_PAYROLL_PERIOD->value)[0]);
                         Route::controller(PayrollApiController::class)
