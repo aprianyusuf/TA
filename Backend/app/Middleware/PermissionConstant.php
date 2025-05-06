@@ -41,11 +41,11 @@ enum PermissionConstant: string {
     case EDIT_PAYROLL_PERIOD = "MD00025|edit_payroll_period|5|payroll";
     case DELETE_PAYROLL_PERIOD = "MD00026|delete_payroll_period|5|payroll";
 
-    case MENU_PAYROLL = "MD00022|menu_payroll|5|payroll";
-    case SHOW_PAYROLL = "MD00023|show_payroll|5|payroll";
-    case ADD_PAYROLL = "MD00024|add_payroll|5|payroll";
-    case EDIT_PAYROLL = "MD00025|edit_payroll|5|payroll";
-    case DELETE_PAYROLL = "MD00026|delete_payroll|5|payroll";
+    case MENU_PAYROLL = "MD00027|menu_payroll|5|payroll";
+    case SHOW_PAYROLL = "MD00028|show_payroll|5|payroll";
+    case ADD_PAYROLL = "MD00029|add_payroll|5|payroll";
+    case EDIT_PAYROLL = "MD00030|edit_payroll|5|payroll";
+    case DELETE_PAYROLL = "MD00031|delete_payroll|5|payroll";
 
     public static function names(): array
     {
