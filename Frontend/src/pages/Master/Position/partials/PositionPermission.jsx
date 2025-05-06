@@ -76,6 +76,7 @@ const PositionPermission = ({ organizationPermission = [] }) => {
 														<CheckboxControl
 															label={permissions[field].name}
 															name={`permissions.${field}.value`}
+															
 														/>
 													</div>
 												);

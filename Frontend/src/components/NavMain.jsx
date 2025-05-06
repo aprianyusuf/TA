@@ -25,7 +25,7 @@ import {
 import {
 	ROUTE_LEAVE,
 	ROUTE_MASTER,
-	// ROUTE_PAYROLL,
+	ROUTE_PAYROLL,
 	ROUTE_PROJECT_MANAGEMENT,
 	ROUTE_TIMESHEET,
 } from "@/routes";
@@ -181,7 +181,7 @@ export function NavMain() {
 						</SidebarMenuItem>
 					</Collapsible>
 				) : null} */}
-				{/* {ROUTE_PAYROLL.filter(
+				{ROUTE_PAYROLL.filter(
 					(v) => (permission.includes(v.menu) || v.menu === true) && v.isNavbar,
 				).length > 0 ? (
 					<Collapsible
@@ -215,7 +215,7 @@ export function NavMain() {
 							</CollapsibleContent>
 						</SidebarMenuItem>
 					</Collapsible>
-				) : null} */}
+				) : null}
 			</SidebarMenu>
 		</SidebarGroup>
 	);

@@ -63,14 +63,14 @@ const Login = () => {
 							className="flex flex-col gap-4"
 							onSubmit={onSubmitLogin}
 						>
-							<img
+							{/* <img
 								src={
 									"https://rootdigitaltechnology.com/images/logo/Logo-01.png"
 								}
 								alt="logo-rdt"
 								className="w-40 object-contain"
-							/>
-							<h2 className="text-xl font-bold">Masuk</h2>
+							/> */}
+							<h2 className="text-xl font-bold text-center">Selamat Datang, Silahkan Login !</h2>
 							<InputControl
 								label="Email"
 								name="email"

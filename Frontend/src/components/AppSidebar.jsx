@@ -17,13 +17,13 @@ export function AppSidebar({ ...props }) {
 	return (
 		<Sidebar collapsible="offcanvas" variant="sidebar" {...props}>
 			<SidebarHeader className="px-2 pb-0 pt-2">
-				<Link to={"/"}>
+				{/* <Link to={"/"}>
 					<img
 						alt="logo-organization"
 						src="https://rootdigitaltechnology.com/images/logo/Logo-01.png"
 						className="w-28 object-contain"
 					/>
-				</Link>
+				</Link> */}
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarSwitcher />

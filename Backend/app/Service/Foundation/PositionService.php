@@ -59,12 +59,14 @@ class PositionService
                 'created_at' => now()
             ];
 
+            $positionId = Str::ulid();
             if ((bool)$request->positionId) {
                 $insert = array_merge($insert, [
                     'position_id' => $request->positionId,
+                    'id'    =>  $positionId,
                 ]);
             }
-            $positionId = DB::table('positions')
+            DB::table('positions')
                 ->insertGetId($insert);
 
             $permissions = DB::table('permissions')

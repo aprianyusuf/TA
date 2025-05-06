@@ -2,7 +2,7 @@ import { lazy } from "react";
 
 import ClockInOut from "./pages/Leave/ClockInOut/ClockInOut";
 import LeaveRequest from "./pages/Leave/Request/LeaveRequest";
-// import Salary from "./pages/Payroll/Salary/Salary";
+import Salary from "./pages/Payroll/Salary/Salary";
 
 export const ROUTE_MASTER = [
 	// {
@@ -93,16 +93,23 @@ export const ROUTE_LEAVE = [
 	},
 ];
 
-// export const ROUTE_PAYROLL = [
-// 	{
-// 		Component: Salary,
-// 		path: "salary",
-// 		menu: true,
-// 		title: "Salary",
-// 		fullPath: "/payroll/salary",
-// 		isNavbar: true,
-// 	},
-// ];
+export const ROUTE_PAYROLL = [
+	{
+		Component: lazy(() => import("@/pages/Payroll/Salary/Salary")),
+		path: "salary",
+		menu: "MD00007",
+		isLazy: true,
+		title: "Payroll",
+		fullPath: "/payroll/salary",
+		isNavbar: true,
+	},
+	{
+		Component: lazy(() => import("@/pages/Payroll/Salary/EditSalary")),
+		path: "salary/edit/:id",
+		menu: "MD00009",
+		isLazy: true,
+	},
+];
 
 export const ROUTE_PROJECT_MANAGEMENT = [
 	{
@@ -195,15 +202,15 @@ export const ROUTE_PROJECT = [
 ];
 
 export const ROUTE_TIMESHEET = [
-	// {
-	// 	Component: lazy(
-	// 		() => import("@/pages/Timesheet/MonthlyTimesheet/MonthlyTimesheet"),
-	// 	),
-	// 	path: "/",
-	// 	menu: true,
-	// 	isLazy: true,
-	// 	title: "Timesheet",
-	// 	fullPath: "/timesheet",
-	// 	isNavbar: true,
-	// },
+	{
+		Component: lazy(
+			() => import("@/pages/Timesheet/MonthlyTimesheet/MonthlyTimesheet"),
+		),
+		path: "/",
+		menu: true,
+		isLazy: true,
+		title: "Timesheet",
+		fullPath: "/timesheet",
+		isNavbar: true,
+	},
 ];

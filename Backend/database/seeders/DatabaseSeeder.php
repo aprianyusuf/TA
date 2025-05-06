@@ -8,6 +8,7 @@ use Database\Seeders\ProjectManagement\ProjectSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -42,14 +43,25 @@ class DatabaseSeeder extends Seeder
                 ->insert($permissions->toArray());
 
             $position = [
-                ['id' => Str::ulid(), 'name' => 'CEO', 'organization_id' => $rdtOrganization->id, 'position_id' => null],
-                ['id' => Str::ulid(), 'name' => 'CTO', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
-                ['id' => Str::ulid(), 'name' => 'COO', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
-                ['id' => Str::ulid(), 'name' => 'HR', 'organization_id' => $rdtOrganization->id, 'position_id' => 'HR'],
-                ['id' => Str::ulid(), 'name' => 'Project Manager', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
-                ['id' => Str::ulid(), 'name' => 'Lead Software Engineer', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CTO'],
-                ['id' => Str::ulid(), 'name' => 'Software Engineer', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Lead Software Engineer'],
-                ['id' => Str::ulid(), 'name' => 'Business Development', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Business Development'],
+                ['id' => Str::ulid(), 'name' => 'Direktur', 'organization_id' => $rdtOrganization->id, 'position_id' => null],
+                ['id' => Str::ulid(), 'name' => 'General Manager', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Direktur'],
+                ['id' => Str::ulid(), 'name' => 'HR', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Direktur'],
+                ['id' => Str::ulid(), 'name' => 'Manager Area', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
+                ['id' => Str::ulid(), 'name' => 'Manager Umum', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
+                ['id' => Str::ulid(), 'name' => 'Manager Marketing', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
+                ['id' => Str::ulid(), 'name' => 'Manager Keuangan', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
+                ['id' => Str::ulid(), 'name' => 'Staff Pemberkasan', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Manager Umum'],
+                ['id' => Str::ulid(), 'name' => 'Staff Perlengkapan', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Manager Umum'],
+                ['id' => Str::ulid(), 'name' => 'Staff Marketing', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Manager Marketing'],
+                ['id' => Str::ulid(), 'name' => 'Staff Keuangan', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Manager Keuangan'],
+                // ['id' => Str::ulid(), 'name' => 'CEO', 'organization_id' => $rdtOrganization->id, 'position_id' => null],
+                // ['id' => Str::ulid(), 'name' => 'CTO', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
+                // ['id' => Str::ulid(), 'name' => 'COO', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
+                // ['id' => Str::ulid(), 'name' => 'HR', 'organization_id' => $rdtOrganization->id, 'position_id' => 'COO'],
+                // ['id' => Str::ulid(), 'name' => 'Project Manager', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CEO'],
+                // ['id' => Str::ulid(), 'name' => 'Lead Software Engineer', 'organization_id' => $rdtOrganization->id, 'position_id' => 'CTO'],
+                // ['id' => Str::ulid(), 'name' => 'Software Engineer', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Lead Software Engineer'],
+                // ['id' => Str::ulid(), 'name' => 'Business Development', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Business Development'],
             ];
 
             foreach ($position as $p) {
@@ -68,41 +80,88 @@ class DatabaseSeeder extends Seeder
 
             $users = [
                 [
-                    'first_name'   => 'Deo',
-                    'last_name'    => 'Alif',
-                    'position_id'  => 'CEO',
+                    'first_name' => 'Zainal',
+                    'last_name' => 'Arifin',
+                    'position_id' => 'Direktur',
                     'report_to_id' => null,
                     'subordinates' => [
-                        ['first_name' => 'Nur Muhammad', 'last_name' => 'Husein', 'position_id' => 'Project Manager'],
-                    ],
+                        ['first_name' => 'Kris', 'last_name' => 'Susanto', 'position_id' => 'General Manager'],
+                        ['first_name' => 'Aldo', 'last_name' => 'Moro', 'position_id' => 'HR']
+                    ]
                 ],
                 [
-                    'first_name'   => 'Muhammad',
-                    'last_name'    => 'Ikhbal',
-                    'position_id'  => 'CTO',
-                    'report_to_id' => 'Deo',
-                    'subordinates' => [
-                        [
-                            'first_name'   => 'Ackyra',
-                            'last_name'    => 'Sibarani',
-                            'position_id'  => 'Lead Software Engineer',
-                            'subordinates' => [
-                                ['first_name' => 'Markus', 'last_name' => 'Togi', 'position_id' => 'Software Engineer'],
-                            ],
-                        ],
-                    ],
+                    'first_name' => 'Ahmad',
+                    'last_name' => 'Sueb',
+                    'position_id' => 'Manager Area',
+                    'report_to_id' => 'Kris',
+                    'subordinates'=>[]
                 ],
                 [
-                    'first_name'   => 'Abi',
-                    'last_name'    => 'Rohmat',
-                    'position_id'  => 'COO',
-                    'report_to_id' => 'Deo',
+                    'first_name' => 'Andre Hartono',
+                    'last_name' => 'Nugroho',
+                    'position_id' => 'Manager Umum',
+                    'report_to_id' => 'Kris',
                     'subordinates' => [
-                        ['first_name' => 'Chaswanah', 'last_name' => 'Aini', 'position_id' => 'Business Development'],
-                        ['first_name' => 'Aprian', 'last_name' => 'Yusuf', 'position_id' => 'HR'],
-                    ],
+                        ['first_name' => 'Staff', 'last_name' => 'Permberkasan', 'position_id' => 'Staff Pemberkasan'],
+                        ['first_name' => 'Staff', 'last_name' => 'Perlengkapan', 'position_id' => 'Staff Perlengkapan'],
+                    ]
+                ],
+                [
+                    'first_name' => 'Aldilla Dea',
+                    'last_name' => 'Ananda',
+                    'position_id' => 'Manager Marketing',
+                    'report_to_id' => 'Kris',
+                    'subordinates' => [
+                        ['first_name' => 'Staff', 'last_name' => 'Marketing', 'position_id' => 'Staff Marketing'],
+                    ]
+                ],
+                [
+                    'first_name' => 'Noni',
+                    'last_name' => 'Aprilia',
+                    'position_id' => 'Manager Keuangan',
+                    'report_to_id' => 'Kris',
+                    'subordinates' => [
+                        ['first_name' => 'Staff', 'last_name' => 'Keuangan', 'position_id' => 'Staff Keuangan'],
+                    ]
                 ],
             ];
+            // $users = [
+            //     [
+            //         'first_name' => 'Deo',
+            //         'last_name' => 'Alif',
+            //         'position_id' => 'CEO',
+            //         'report_to_id' => null,
+            //         'subordinates' => [
+            //             ['first_name' => 'Nur Muhammad', 'last_name' => 'Husein', 'position_id' => 'Project Manager']
+            //         ]
+            //     ],
+            //     [
+            //         'first_name' => 'Muhammad',
+            //         'last_name' => 'Ikhbal',
+            //         'position_id' => 'CTO',
+            //         'report_to_id' => 'Deo',
+            //         'subordinates' => [
+            //             [
+            //                 'first_name' => 'Ackyra',
+            //                 'last_name' => 'Sibarani',
+            //                 'position_id' => 'Lead Software Engineer',
+            //                 'subordinates' => [
+            //                     ['first_name' => 'Markus', 'last_name' => 'Togi', 'position_id' => 'Software Engineer']
+            //                 ]
+            //             ],
+            //         ]
+            //     ],
+            //     [
+            //         'first_name' => 'Abi',
+            //         'last_name' => 'Rohmat',
+            //         'position_id' => 'COO',
+            //         'report_to_id' => 'Deo',
+            //         'subordinates' => [
+            //             ['first_name' => 'Chaswanah', 'last_name' => 'Aini', 'position_id' => 'Business Development'],
+            //             ['first_name' => 'Aprian', 'last_name' => 'Yusuf', 'position_id' => 'HR']
+            //         ]
+            //     ],
+            // ];
 
             $permissions = Permission::get();
 
@@ -129,12 +188,13 @@ class DatabaseSeeder extends Seeder
 
                 DB::table('permission_position')
                     ->insert($permissions
-                            ->map(function ($val) use ($newUser) {
-                                return [
-                                    'permission_id' => $val->id,
-                                    'position_id'   => $newUser->position_id,
-                                ];
-                            })->toArray());
+                        ->map(function ($val) use ($newUser) {
+                            return [
+                                // 'id'    => Str::ulid(),
+                                'permission_id' => $val->id,
+                                'position_id' => $newUser->position_id
+                            ];
+                        })->toArray());
 
                 $this->recursiveCreateSubordinate($user, $rdtOrganization->id, $permissions, $newUser->id, $i, $pos);
             }
@@ -152,6 +212,12 @@ class DatabaseSeeder extends Seeder
 
     protected function recursiveCreateSubordinate($user, $orgId, $permissions, $superior, &$i, $pos): void
     {
+        Log::info('Recursive Create Subordinates',
+        [
+            $user,
+            $orgId,
+            $permissions
+        ]);
         foreach ($user['subordinates'] as $sub) {
             $subOrdinate = User::create(collect($sub)->only(['first_name', 'last_name'])->toArray() + [
                 'email'                 => formatNameToInitials($sub['first_name'], $sub['last_name']) . '@mitrasaburaiproperti.com',

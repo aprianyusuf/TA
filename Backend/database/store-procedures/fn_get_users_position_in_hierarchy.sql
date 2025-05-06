@@ -1,33 +1,35 @@
-create or replace function public.fn_get_users_position_in_hierarchy(target_organization_id character varying, target_position_id character varying, search_text character varying DEFAULT NULL::character varying)
-    returns TABLE(value character varying, label character varying)
-    language plpgsql
-as
-$$
+CREATE PROCEDURE hris.sp_get_users_position_in_hierarchy(
+    IN target_organization_id VARCHAR(255),
+    IN target_position_id VARCHAR(255),
+    IN search_text VARCHAR(255)
+)
 BEGIN
-    RETURN QUERY
+    -- temp table here
+    CREATE TEMPORARY TABLE tmp_users (value VARCHAR(255), label VARCHAR(255));
+
+    INSERT INTO tmp_users(value, label)
+    SELECT * FROM (
         WITH RECURSIVE position_hierarchy AS (
-            -- Start with the initial position
             SELECT id, name, position_id
             FROM positions
             WHERE id = target_position_id
-
             UNION ALL
-
-            -- Recursive step: get parent positions
             SELECT p.id, p.name, p.position_id
             FROM positions p
-                     INNER JOIN position_hierarchy ph ON p.id = ph.position_id
-        ), users_in_hierarchy AS (
-            -- Get all users for each position in the hierarchy and apply the search filter
-            SELECT u.id::character varying as value, case when u.first_name is null then null else CONCAT(u.first_name, ' ', u.last_name, ' (', ph.name, ')') end::varchar as label
-            FROM users u
-                     INNER JOIN position_hierarchy ph ON u.position_id = ph.id
-            WHERE (search_text IS NULL OR CONCAT(u.first_name, ' ', u.last_name) ILIKE '%' || search_text || '%')
-              and u.organization_id = target_organization_id
+            INNER JOIN position_hierarchy ph ON p.id = ph.position_id
         )
+        SELECT 
+            u.id,
+            CASE WHEN u.first_name IS NULL THEN NULL 
+                 ELSE CONCAT(u.first_name, ' ', u.last_name, ' (', ph.name, ')') 
+            END
+        FROM users u
+        INNER JOIN position_hierarchy ph ON u.position_id = ph.id
+        WHERE (search_text IS NULL OR CONCAT(u.first_name, ' ', u.last_name) LIKE CONCAT('%', search_text, '%'))
+        AND u.organization_id = target_organization_id
+    ) AS derived_table;
 
-        -- Final result: all filtered users in the selected position hierarchy
-        SELECT ui.value, ui.label FROM users_in_hierarchy ui;
-END;
-$$;
+    SELECT * FROM tmp_users;
 
+    DROP TEMPORARY TABLE tmp_users;
+END

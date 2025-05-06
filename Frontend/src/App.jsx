@@ -11,6 +11,7 @@ import Project from "@/pages/Project/Project";
 import ProjectManagement from "@/pages/ProjectManagement/ProjectManagement";
 import Timesheet from "@/pages/Timesheet/Timesheet";
 import Template from "@/templates/Template";
+import Payroll from "./pages/Payroll/Payroll";
 
 function App() {
 	return (
@@ -20,6 +21,7 @@ function App() {
 				<Route path="/" element={<Template />}>
 					<Route path="/master/*" element={<Master />} />
 					<Route path="/leave/*" element={<Leave />} />
+					<Route path="/payroll/*" element={<Payroll />} />
 					<Route path="/timesheet/*" element={<Timesheet />} />
 					<Route path="/project-management/*" element={<ProjectManagement />} />
 					<Route path="/projects/*" element={<Project />} />
