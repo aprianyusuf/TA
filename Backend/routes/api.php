@@ -143,11 +143,22 @@ Route::prefix('v1')->group(function () {
                         Route::controller(PayrollApiController::class)
                             ->prefix('payrolls')
                             ->group(function () {
-                                Route::get('/', 'getPayrollsByPeriod')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_PAYROLL->value)[0]);
+                                Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_PAYROLL->value)[0]);
+                                Route::get('/{payrollId}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_PAYROLL->value)[0]);
                             });
                     });
                 });
         });
+
+    // Route::prefix('payroll')
+    //     ->group(function () {
+    //         Route::controller(PayrollApiController::class)
+    //             ->prefix('payrolls')
+    //             ->group(function () {
+    //                 Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_PAYROLL->value)[0]);
+    //                 Route::get('/{id}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_PAYROLL->value)[0]);
+    //             });
+    //     });
 
     Route::prefix('project-management')
         ->group(function () {

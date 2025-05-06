@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\API\V1\Payroll;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Service\Payroll\PayrollService;
 use App\Http\Resources\Payroll\PayrollIndexResource;
+use App\Service\Payroll\PayrollService;
+use Illuminate\Http\Request;
 
 class PayrollApiController extends Controller
 {
@@ -21,25 +20,24 @@ class PayrollApiController extends Controller
      *
      * @body array{status: string, code: int, data: array[], count: int}
      */
-    public function index(Request $request)
+    public function index(Request $request, $payrollPeriodId)
     {
-        $request->validate([
-            'status' => 'string|in:active,inactive',
-            'code' => 'integer',
-        ]);
-        [$data, $count] = $this->payrollService->getData($request);
+        [$data, $count] = $this->payrollService->getData($request, $payrollPeriodId);
 
         return $this->successResponse(PayrollIndexResource::collection($data), optionalResponses: ['count' => $count]);
     }
 
-    public function show(Request $request, string $id)
-    {
-        $request->validate([
-            'status' => 'string|in:active,inactive',
-            'code' => 'integer',
-        ]);
-        $data = $this->payrollService->getData($request, $id);
+    /**
+     * Show payroll
+     */
 
-        return $this->successResponse(new PayrollIndexResource($data));
+    public function show(Request $request, $payrollPeriodId, $payrollId)
+    {
+        [$data, $count] = $this->payrollService->getData($request, $payrollPeriodId, $payrollId);
+        return $this->successResponse(data: $data, optionalResponses: ['count' => $count]);
+
+        // $data = $this->payrollService->getData($request, $id);
+
+        // return $this->successResponse(new PayrollIndexResource($data));
     }
 }

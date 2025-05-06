@@ -17,9 +17,10 @@ class PayrollService
         //
     }
 
-    public function getData(Request $request, string $id = null)
+    public function getData(Request $request, string $payrollPeriodId = null, string $payrollId = null)
     {
-        $auth  = $request->decoded;
+        $auth = $request->decoded;
+
         $query = DB::table('payrolls as p')
             ->join('employees as e', 'e.id', '=', 'p.employee_id')
             ->join('users as u', 'u.id', '=', 'e.user_id')
@@ -27,8 +28,11 @@ class PayrollService
                 $join->on('pp.id', '=', 'p.payroll_period_id')
                     ->join('organizations as o', 'o.id', '=', 'pp.organization_id');
             })
-            ->when($request->get('period_id'), function ($query) use ($request) {
-                $query->where('p.payroll_period_id', $request->get('period_id'));
+            ->when(!is_null($payrollPeriodId), function ($query) use ($payrollPeriodId) {
+                $query->where('p.payroll_period_id', $payrollPeriodId);
+            })
+            ->when(!is_null($payrollId), function ($query) use ($payrollId) {
+                $query->where('p.id', $payrollId);
             })
             ->when($request->get('employee_id'), function ($query) use ($request) {
                 $query->where('e.id', $request->get('employee_id'));
@@ -43,44 +47,49 @@ class PayrollService
                 'p.deduction',
                 'p.net_pay',
                 'p.currency',
-                'p.payroll_period_id as payroll_period_id',
-                'u.first_name as first_name',
-                'u.last_name as last_name',
-                'u.email as email',
+                'p.payroll_period_id',
+                'u.first_name',
+                'u.last_name',
+                'u.email',
                 'o.name as organization_name',
                 'o.id as organization_id',
                 'e.id as employee_id',
                 'e.salary as salary',
             ]);
+
         $count = $query->count('p.id');
-        $data  = $query
+
+        $data = $query
             ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
             ->limit($request->get('size', 10))
-            ->get()->map(function ($payroll) {
-            $query = DB::table('payroll_bonuses as pb')
-                ->where('pb.payroll_id', '=', $payroll->id)
-                ->join('payroll_bonus_types as pbt', 'pbt.id', '=', 'pb.payroll_bonus_type_id')
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
-                ->select([
-                    'pb.id as id',
-                    'pb.value as value',
-                    'pbt.name as type',
-                ]);
-            $payroll->bonuses = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Bonus->value)
-                ->get();
-            $payroll->bonus_value = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Bonus->value)
-                ->sum('pb.value');
-            $payroll->deductions = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
-                ->get();
-            $payroll->deduction_value = $query
-                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
-                ->sum('pb.value');
-            $payroll->net_pay = $payroll->salary + $payroll->bonus_value - $payroll->deduction_value;
-            return $payroll;
-        });
+            ->get()
+            ->map(function ($payroll) {
+                $bonusQuery = DB::table('payroll_bonuses as pb')
+                    ->join('payroll_bonus_types as pbt', 'pbt.id', '=', 'pb.payroll_bonus_type_id')
+                    ->where('pb.payroll_id', $payroll->id);
+
+                $payroll->bonuses = (clone $bonusQuery)
+                    ->where('pbt.type', PayrollBonusTypeEnum::Bonus->value)
+                    ->select(['pb.id', 'pb.value', 'pbt.name as type'])
+                    ->get();
+
+                $payroll->bonus_value = (clone $bonusQuery)
+                    ->where('pbt.type', PayrollBonusTypeEnum::Bonus->value)
+                    ->sum('pb.value');
+
+                $payroll->deductions = (clone $bonusQuery)
+                    ->where('pbt.type', PayrollBonusTypeEnum::Deduction->value)
+                    ->select(['pb.id', 'pb.value', 'pbt.name as type'])
+                    ->get();
+
+                $payroll->deduction_value = (clone $bonusQuery)
+                    ->where('pbt.type', PayrollBonusTypeEnum::Deduction->value)
+                    ->sum('pb.value');
+
+                $payroll->net_pay = $payroll->salary + $payroll->bonus_value - $payroll->deduction_value;
+
+                return $payroll;
+            });
 
         return [$data, $count];
     }
