@@ -28,8 +28,8 @@ class AuthenticationApiController extends Controller
     {
         $request->validate([
             /**
-             * @default muhammad.ikhbal@mitrasaburaiproperti.com
-             * @example muhammad.ikhbal@mitrasaburaiproperti.com
+             * @default zainal.arifin@mitrasaburaiproperti.com
+             * @example zainal.arifin@mitrasaburaiproperti.com
              * */
             'email'    => ['required', 'email'],
             /** @default password */

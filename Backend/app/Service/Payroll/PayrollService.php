@@ -1,6 +1,7 @@
 <?php
 namespace App\Service\Payroll;
 
+use App\Utils\Enums\PayrollBonusTypeEnum;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class PayrollService
         //
     }
 
-    public function getData(Request $request)
+    public function getData(Request $request, string $id = null)
     {
         $auth  = $request->decoded;
         $query = DB::table('payrolls as p')
@@ -24,7 +25,7 @@ class PayrollService
             ->join('users as u', 'u.id', '=', 'e.user_id')
             ->join('payroll_periods as pp', function (JoinClause $join) {
                 $join->on('pp.id', '=', 'p.payroll_period_id')
-                    ->join('organizations as o', 'o.id','=', 'pp.organization_id');
+                    ->join('organizations as o', 'o.id', '=', 'pp.organization_id');
             })
             ->when($request->get('period_id'), function ($query) use ($request) {
                 $query->where('p.payroll_period_id', $request->get('period_id'));
@@ -37,6 +38,12 @@ class PayrollService
                 'p.salary',
                 'p.created_at',
                 'p.updated_at',
+                'p.status',
+                'p.bonus',
+                'p.deduction',
+                'p.net_pay',
+                'p.currency',
+                'p.payroll_period_id as payroll_period_id',
                 'u.first_name as first_name',
                 'u.last_name as last_name',
                 'u.email as email',
@@ -46,9 +53,61 @@ class PayrollService
                 'e.salary as salary',
             ]);
         $count = $query->count('p.id');
-        $data  = $query->get();
+        $data  = $query->get()->map(function ($payroll) {
+            $query = DB::table('payroll_bonuses as pb')
+                ->where('pb.payroll_id', '=', $payroll->id)
+                ->join('payroll_bonus_types as pbt', 'pbt.id', '=', 'pb.payroll_bonus_type_id')
+                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
+                ->select([
+                    'pb.id as id',
+                    'pb.value as value',
+                    'pbt.name as type',
+                ]);
+            $payroll->bonuses = $query
+                ->where('pbt.type', '=', PayrollBonusTypeEnum::Bonus->value)
+                ->get();
+            $payroll->bonus_value = $query
+                ->where('pbt.type', '=', PayrollBonusTypeEnum::Bonus->value)
+                ->sum('pb.value');
+            $payroll->deductions = $query
+                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
+                ->get();
+            $payroll->deduction_value = $query
+                ->where('pbt.type', '=', PayrollBonusTypeEnum::Deduction->value)
+                ->sum('pb.value');
+            $payroll->net_pay = $payroll->salary + $payroll->bonus_value - $payroll->deduction_value;
+            return $payroll;
+        });
 
         return [$data, $count];
+    }
+
+    public function getPayrollsByPeriod(Request $request)
+    {
+        $auth  = $request->decoded;
+        $query = DB::table('payroll_periods as pp')
+            ->join('payrolls as p', function (JoinClause $join) {
+                $join->on('pp.id', '=', 'p.payroll_period_id')
+                    ->join('employees as e', function (JoinClause $join) {
+                        $join->on('e.id', '=', 'p.employee_id')
+                            ->join('users as u', 'u.id', '=', 'e.user_id');
+                    });
+            })
+            ->join('organizations as o', 'o.id', '=', 'pp.organization_id')
+            ->where('pp.id', $request->get('period_id'))
+            ->select([
+                'p.id',
+                'p.salary',
+                'p.created_at',
+                'p.updated_at',
+                'p.status',
+                'p.bonus',
+                'p.deduction',
+                'p.net_pay',
+                'p.currency',
+                'pp.start_at as period_start_at',
+                'pp.end_at as period_end_at',
+            ]);
     }
 
     public function getPayrollPeriodQuery($organizationId)
@@ -104,7 +163,7 @@ class PayrollService
 
         // Fetch employees who do NOT have payrolls assigned in the current payroll period
         $employees = DB::table('employees as e')
-            ->join('users as u', function( JoinClause $join){
+            ->join('users as u', function (JoinClause $join) {
                 $join->on('u.id', '=', 'e.user_id')
                     ->where('u.organization_id', '=', 'o.id');
             })

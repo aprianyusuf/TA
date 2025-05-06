@@ -31,4 +31,15 @@ class PayrollApiController extends Controller
 
         return $this->successResponse(PayrollIndexResource::collection($data), optionalResponses: ['count' => $count]);
     }
+
+    public function show(Request $request, string $id)
+    {
+        $request->validate([
+            'status' => 'string|in:active,inactive',
+            'code' => 'integer',
+        ]);
+        $data = $this->payrollService->getData($request, $id);
+
+        return $this->successResponse(new PayrollIndexResource($data));
+    }
 }

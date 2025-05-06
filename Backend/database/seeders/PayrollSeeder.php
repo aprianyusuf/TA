@@ -16,9 +16,16 @@ class PayrollSeeder extends Seeder
 
         $employees = DB::table('employees')
             ->join('users', 'users.id', '=', 'employees.user_id')
+            // ->join('leave_requests as lr', 'lr.employee_id', '=', 'employees.id')
             ->where('users.organization_id', $organization->id)
             ->select('employees.*', 'users.organization_id')
-            ->get();
+            ->get()->map(function($employee){
+                $employee->leave_requests = DB::table('leave_requests')
+                    ->where('employee_id', $employee->id)
+                    ->where('status', 1)
+                    ->get();
+                return $employee;
+            });
 
         $payrollService = new PayrollService();
         $payrollPeriods = $payrollService->getPayrollPeriods($organization->id);
@@ -29,8 +36,9 @@ class PayrollSeeder extends Seeder
                     'id'                => Str::ulid(),
                     'employee_id'       => $employee->id,
                     'payroll_period_id' => $payrollPeriod->id,
-                    'organization_id'   => $employee->organization_id,
                     'salary'            => $employee->salary,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
                 ];
                 DB::table('payrolls')->insert($payroll);
             }

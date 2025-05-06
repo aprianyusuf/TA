@@ -13,5 +13,6 @@ class PayrollBonusTypeSeeder extends Seeder
     public function run(): void
     {
         //
+        
     }
 }

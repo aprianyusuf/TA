@@ -18,10 +18,9 @@ return new class extends Migration
             $table->foreign('employee_id')->references('id')->on('employees')->cascadeOnDelete();
             $table->char('payroll_period_id',26)->index();
             $table->foreign('payroll_period_id')->references('id')->on('payroll_periods')->cascadeOnDelete();
-            $table->dateTime('payroll_date')->index();
             $table->decimal('salary', 15, 2)->default(0);
             $table->decimal('bonus', 15, 2)->default(0);
-            $table->decimal('deductions', 15, 2)->default(0);
+        $table->decimal('deduction', 15, 2)->default(0);
             $table->decimal('net_pay', 15, 2)->default(0);
             $table->unsignedTinyInteger('status')->default(PayrollStatusEnum::Pending->value)->index();
             $table->string('currency')->default('IDR')->index();

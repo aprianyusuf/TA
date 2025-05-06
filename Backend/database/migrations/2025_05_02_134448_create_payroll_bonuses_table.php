@@ -17,8 +17,6 @@ return new class extends Migration
             $table->foreign('payroll_id')->references('id')->on('payrolls')->cascadeOnDelete();
             $table->char('payroll_bonus_type_id', 26)->index();
             $table->foreign('payroll_bonus_type_id')->references('id')->on('payroll_bonus_types')->cascadeOnDelete();
-            $table->char('employee_id', 26)->index();
-            $table->foreign('employee_id')->references('id')->on('employees')->cascadeOnDelete();
             $table->decimal('value', 15, 2)->default(0);
             $table->string('currency')->default('IDR')->index();
             $table->timestamps();
