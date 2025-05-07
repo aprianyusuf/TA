@@ -10,7 +10,7 @@ trait DALTrait
     public function queryTable(Builder $data, ?int $size, ?int $page, ?string $search, ?string $searchBy, ?string $orderColumn, ?string $orderBy): array
     {
         if ($search && $searchBy) {
-            $data->whereRaw("{$searchBy} ILIKE ?", ["%{$search}%"]);
+            $data->whereRaw("{$searchBy} LIKE ?", ["%{$search}%"]);
         }
 
         $count = $data->count();

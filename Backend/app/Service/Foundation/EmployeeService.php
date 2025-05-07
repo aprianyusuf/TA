@@ -66,7 +66,7 @@ class EmployeeService
 
         if ($request->search) {
             $query->where(function (Builder $builder) use ($request) {
-                $builder->whereRaw("CONCAT(u.first_name, ' ', u.last_name) ilike ?", ["%{$request->search}%"]);
+                $builder->whereRaw("CONCAT(u.first_name, ' ', u.last_name) LIKE ?", ["%{$request->search}%"]);
             });
         }
 
@@ -127,25 +127,25 @@ class EmployeeService
     }
 
     public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = null)
-{
-    $fn = 'sp_get_users_position_in_hierarchy'; // harusnya ini isinya "sp_get_users_position_in_hierarchy"
+    {
+        $fn = 'sp_get_users_position_in_hierarchy'; // harusnya ini isinya "sp_get_users_position_in_hierarchy"
 
-    $search = $search !== '' ? $search : null;
+        $search = $search !== '' ? $search : null;
 
-    return DB::select("CALL {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
-}
+        return DB::select("CALL {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
+    }
 
 
-//     public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = null)
-// {
-//     $fn = StoredProcedure::FnGetUsersPositionInHierarchyMysql;
+    //     public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = null)
+    // {
+    //     $fn = StoredProcedure::FnGetUsersPositionInHierarchyMysql;
 
-//     // Kalau kosong string, ubah jadi NULL supaya SQL tidak error
-//     $search = $search !== '' ? $search : null;
+    //     // Kalau kosong string, ubah jadi NULL supaya SQL tidak error
+    //     $search = $search !== '' ? $search : null;
 
     // return DB::select("select * from {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
-    
-// }
+
+    // }
 
 
     public function createEmployee(StoreEmployeeRequest $storeEmployeeRequest)

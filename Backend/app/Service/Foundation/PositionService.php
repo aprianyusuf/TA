@@ -27,7 +27,7 @@ class PositionService
             ->where('p.organization_id', $request->decoded->get('organization')?->get('id'));
 
         if ($request->search) {
-            $query->whereRaw("p.name ILIKE ?", ["%{$request->search}%"]);
+            $query->whereRaw("p.name LIKE ?", ["%{$request->search}%"]);
         }
 
         $count = $query->count();

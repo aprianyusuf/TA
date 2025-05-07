@@ -31,7 +31,7 @@ class OrganizationService
 
         if (collect($request->get('filters'))?->where('column', 'name')->count()) {
             $filter = collect(collect($request->get('filters'))->where('column', 'name')->first());
-            $condition = $filter->get('condition') === 'equals' ? '=' : 'ILIKE';
+            $condition = $filter->get('condition') === 'equals' ? '=' : 'LIKE';
             $value = $condition === '=' ? $filter->get('value') : "%{$filter->get('value')}%";
 
             $query = $query->whereRaw("name {$condition} ?", [$value]);
@@ -39,7 +39,7 @@ class OrganizationService
 
         if (collect($request->get('filters'))?->where('column', 'domain')->count()) {
             $filter = collect(collect($request->get('filters'))->where('column', 'domain')->first());
-            $condition = $filter->get('condition') === 'equals' ? '=' : 'ILIKE';
+            $condition = $filter->get('condition') === 'equals' ? '=' : 'LIKE';
             $value = $condition === '=' ? $filter->get('value') : "%{$filter->get('value')}%";
 
             $query = $query->whereRaw("domain {$condition} ?", [$value]);
@@ -65,7 +65,7 @@ class OrganizationService
             $datetime = new DateTime('now', $timezone);
 
             $offsetInHours = $timezone->getOffset($datetime) / 60 / 60;
-            
+
             $organization = Organization::query()
                 ->create([
                     'id'                            => Str::ulid(),
@@ -139,7 +139,7 @@ class OrganizationService
             ->whereNotIn('m.name', ['System', 'Project Management']);
 
         if ($request->search) {
-            $query->whereRaw("p.name ILIKE ?", ["%{$request->search}%"]);
+            $query->whereRaw("p.name LIKE ?", ["%{$request->search}%"]);
         }
 
         $query = $query->orderBy('p.id')->get();
