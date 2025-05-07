@@ -5,7 +5,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { ChildrenPlacementType, Enabled, PageFitMode } from "basicprimitives";
 import { OrgDiagram } from "basicprimitivesreact";
 import { Edit, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import EmployeeApi from "@/apis/v1/MasterApi/EmployeeApi";
 import PayrollApi from "@/apis/v1/PayrollApi/PayrollApi";
@@ -21,13 +21,17 @@ import { useDataTable } from "@/hooks/useDataTable";
 import { getPaginationPage, isUserCan } from "@/services/helper";
 import CheckAuthorization from "@/templates/CheckAuthorization";
 import OrganizationDiagram from "@/pages/Master/Employee/partials/OrganizationDiagram";
+import { useCustomQuery } from "@/hooks/useCustomQuery";
 
 const columnHelper = createColumnHelper();
 
-const Employee = () => {
+const PayrollPeriodShow = () => {
+	const { id } = useParams();
+	
 	const { data, isLoading, pagination, setPagination } = useDataTable({
-		api: PayrollApi.getAll,
-		queryKey: "employees",
+		api: PayrollApi.getPayrollsByPeriod,
+		queryKey: ["payrollByPeriod", { id }],
+		queryParams: { id },
 	});
 
 	const columns = useMemo(
@@ -92,7 +96,14 @@ const Employee = () => {
 		<>
 			<Tabs defaultValue="table" className="flex h-full w-full flex-col">
 				<TabsContent value="table">
-					<div className="mb-4 flex justify-end">
+					<div className="mb-4 flex items-center justify-between">
+						<h2 className="text-xl font-bold ml-5">Payroll Management</h2>
+						<Button asChild title="Add Payroll">
+							<Link to={"add"}>
+								<Plus size={16} className="mr-2" />
+								Add Payroll
+							</Link>
+						</Button>
 					</div>
 					<Table
 						columns={columns({
@@ -113,6 +124,6 @@ const Employee = () => {
 };
 
 export default CheckAuthorization({
-	Component: Employee,
-	menu: "MD00001",
+	Component: PayrollPeriodShow,
+	menu: "MD00023",
 });

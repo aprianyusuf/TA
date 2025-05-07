@@ -150,7 +150,7 @@ const ModalRequest = ({
 
 	const queryClient = useQueryClient();
 
-	const { onSubmit: onSubmitTimesheet, isLoading: isLoadingSubmitTimesheet } =
+	const { onSubmit: onSubmitRequest, isLoading: isLoadingSubmitRequest } =
 		useCustomMutation({
 			api:
 				LeaveRequestApi.createLeaveRequest,
@@ -214,7 +214,7 @@ const ModalRequest = ({
 			payload.id = state.id;
 		}
 
-		onSubmitTimesheet(payload, e);
+		onSubmitRequest(payload, e);
 	};
 
 	return (
@@ -254,11 +254,11 @@ const ModalRequest = ({
 				<div className="mt-3 flex justify-end gap-2">
 					<Button
 						type="submit"
-						disabled={isLoadingSubmitTimesheet}
+						disabled={isLoadingSubmitRequest}
 						className="w-36"
 						value="submit"
 					>
-						{isLoadingSubmitTimesheet ? <Spinner /> : "Submit"}
+						{isLoadingSubmitRequest ? <Spinner /> : "Submit"}
 					</Button>
 				</div>
 			</HookFormProvider>

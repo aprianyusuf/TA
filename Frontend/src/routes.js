@@ -2,7 +2,7 @@ import { lazy } from "react";
 
 import ClockInOut from "./pages/Leave/ClockInOut/ClockInOut";
 import LeaveRequest from "./pages/Leave/Request/LeaveRequest";
-import Salary from "./pages/Payroll/Salary/Salary";
+import Salary from "./pages/Payroll/PayrollPeriod/PayrollPeriodShow";
 
 export const ROUTE_MASTER = [
 	// {
@@ -95,18 +95,30 @@ export const ROUTE_LEAVE = [
 
 export const ROUTE_PAYROLL = [
 	{
-		Component: lazy(() => import("@/pages/Payroll/Salary/Salary")),
-		path: "salary",
-		menu: "MD00007",
+		Component: lazy(() => import("@/pages/Payroll/PayrollPeriod/PayrollPeriod")),
+		path: "payrollperiod",
+		menu: "MD00022",
 		isLazy: true,
 		title: "Payroll",
-		fullPath: "/payroll/salary",
+		fullPath: "/payroll/payrollperiod",
 		isNavbar: true,
 	},
 	{
-		Component: lazy(() => import("@/pages/Payroll/Salary/EditSalary")),
-		path: "salary/edit/:id",
-		menu: "MD00009",
+		Component: lazy(() => import("@/pages/Payroll/PayrollPeriod/PayrollPeriodShow")),
+		path: "payrollperiod/add",
+		menu: "MD00024",
+		isLazy: true,
+	},
+	{
+		Component: lazy(() => import("@/pages/Payroll/PayrollPeriod/PayrollPeriodShow")),
+		path: "payrollperiod/:id",
+		menu: "MD00023",
+		isLazy: true,
+	},
+	{
+		Component: lazy(() => import("@/pages/Payroll/PayrollPeriod/PayrollShow")),
+		path: "payrollperiod/edit/:id",
+		menu: "MD00025",
 		isLazy: true,
 	},
 ];

@@ -19,11 +19,12 @@ import { AddEmployeeSchema } from "@/schema/request/Foundation/EmployeeRequestSc
 import CheckAuthorization from "@/templates/CheckAuthorization";
 import NotFound from "@/templates/NotFound";
 import { EmploymentTypeControl, HiredDateControl, PositionControl, SuperiorControl } from "@/pages/Master/Employee/partials/FormEmployeeControl";
+import PayrollApi from "@/apis/v1/PayrollApi/PayrollApi";
 
-const EditSalary = () => {
+const PayrollShow = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-
+	
 	const {
 		data: detailEmployee,
 		isLoading: isLoadingDetailEmployee,
@@ -162,6 +163,6 @@ const EditSalary = () => {
 };
 
 export default CheckAuthorization({
-	Component: EditSalary,
-	menu: "MD00003",
+	Component: PayrollShow,
+	menu: "MD00025",
 });
