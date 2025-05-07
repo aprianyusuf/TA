@@ -1,19 +1,16 @@
 <?php
-
 namespace App\Http\Controllers\API\V1\Foundation;
 
 use App\Http\Controllers\Controller;
-use App\Models\Foundation\Employee;
 use App\Http\Requests\Foundation\Employee\StoreEmployeeRequest;
-use App\Http\Requests\Foundation\Employee\UpdateEmployeeRequest;
 use App\Http\Resources\Foundation\EmployeeResource;
 use App\Http\Resources\Foundation\ErrorResource;
 use App\Http\Resources\Foundation\OptionResource;
+use App\Models\Foundation\Employee;
 use App\Service\Foundation\EmployeeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class EmployeeApiController extends Controller
 {
@@ -24,7 +21,7 @@ class EmployeeApiController extends Controller
 
     /**
      * List Employee
-     * 
+     *
      * List all employee in organization
      */
     public function index(Request $request, EmployeeService $employeeService)
@@ -33,7 +30,7 @@ class EmployeeApiController extends Controller
 
         /**
          * List all employee in organization
-         * 
+         *
          * @status 200
          * @body array{status: string, code: int, data: EmployeeService[], count: int}
          */
@@ -42,7 +39,7 @@ class EmployeeApiController extends Controller
 
     /**
      * Hierarchical Employee
-     * 
+     *
      * Get employee by hierarchical
      */
     public function hierarchy(Request $request, EmployeeService $employeeService)
@@ -51,7 +48,7 @@ class EmployeeApiController extends Controller
 
         /**
          * Hierarchical Organization
-         * 
+         *
          * @status 200
          * @body array{status: string, code: int, data: EmployeeService[]}
          */
@@ -60,21 +57,21 @@ class EmployeeApiController extends Controller
 
     /**
      * List Employee By Position
-     * 
+     *
      * List all employee by position
      */
     public function employeeByPosition(Request $request, EmployeeService $employeeService)
     {
         $request->validate([
             'positionId' => ['required', 'ulid'],
-            'search' => ['nullable'],
+            'search'     => ['nullable'],
         ]);
 
         $data = $employeeService->employeeByPosition(organizationId: $request->decoded->get('organization')?->get('id'), positionId: $request->get('positionId'), search: $request->get('search', ''));
 
         /**
          * @status 200
-         * 
+         *
          * @body array{status: string, code: int, data: OptionResource[], count: int}
          */
         return $this->successResponse(data: $data, optionalResponses: ['count' => collect($data)->count()]);
@@ -82,7 +79,7 @@ class EmployeeApiController extends Controller
 
     /**
      * Create an employee
-     * 
+     *
      * Create new employee
      */
     public function store(StoreEmployeeRequest $request, EmployeeService $employeeService)
@@ -96,7 +93,7 @@ class EmployeeApiController extends Controller
         if ($isPositionValid == null) {
             /**
              * Position is not valid
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -106,10 +103,10 @@ class EmployeeApiController extends Controller
 
         $isSuperiorValid = $employeeService->employeeByPosition(organizationId: $request->decoded->get('organization')?->get('id'), positionId: $request->positionId);
 
-        if (!is_null($request->reportToId) && !collect($isSuperiorValid)->pluck("value")->contains($request->reportToId)) {
+        if (! is_null($request->reportToId) && ! collect($isSuperiorValid)->pluck("value")->contains($request->reportToId)) {
             /**
              * Superior is not valid
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -136,7 +133,7 @@ class EmployeeApiController extends Controller
         if ($employee == null) {
             /**
              * Employee not found
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -154,12 +151,12 @@ class EmployeeApiController extends Controller
     /**
      * Update employee
      */
-    public function update(StoreEmployeeRequest $request, string  $id)
+    public function update(StoreEmployeeRequest $request, string $id)
     {
         if ($request->reportToId == $id) {
             /**
              * Superior is not valid
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -176,7 +173,7 @@ class EmployeeApiController extends Controller
         if ($isPositionValid == null) {
             /**
              * Position is not valid
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -186,10 +183,10 @@ class EmployeeApiController extends Controller
 
         $isSuperiorValid = $this->employeeService->employeeByPosition(organizationId: $request->decoded->get('organization')?->get('id'), positionId: $request->positionId);
 
-        if (!is_null($request->reportToId) && !collect($isSuperiorValid)->pluck("value")->contains($request->reportToId)) {
+        if (! is_null($request->reportToId) && ! collect($isSuperiorValid)->pluck("value")->contains($request->reportToId)) {
             /**
              * Superior is not valid
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -222,7 +219,7 @@ class EmployeeApiController extends Controller
         if ($user === null) {
             /**
              * Employee not found
-             * 
+             *
              * @status 404
              * @body ErrorResource
              */

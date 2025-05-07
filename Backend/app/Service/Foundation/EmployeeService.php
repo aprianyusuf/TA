@@ -164,6 +164,7 @@ class EmployeeService
             $employeePayload = [
                 'id' => Str::ulid(),
                 'user_id' => $user->id,
+                'salary' => $storeEmployeeRequest->salary,
                 'marital' => $storeEmployeeRequest->marital,
                 'religion' => $storeEmployeeRequest->religion,
                 'birth_at' => $storeEmployeeRequest->birthAt,
@@ -257,6 +258,7 @@ class EmployeeService
                 'marital' => $this->request->marital,
                 'religion' => $this->request->religion,
                 'birth_at' => $this->request->birthAt,
+                'salary' => $this->request->salary,
                 'hired_start_at' => $this->request->hiredStartAt,
                 'employment_type' => $this->request->employmentType,
                 'identity_number' => $this->request->identityNumber,
