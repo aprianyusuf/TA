@@ -128,11 +128,11 @@ class EmployeeService
 
     public function employeeByPosition(?string $organizationId, ?string $positionId, string $search = null)
     {
-        $fn = 'sp_get_users_position_in_hierarchy'; // harusnya ini isinya "sp_get_users_position_in_hierarchy"
+        $fn = "SELECT * FROM  public.fn_get_users_position_in_hierarchy";
 
         $search = $search !== '' ? $search : null;
 
-        return DB::select("CALL {$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
+        return DB::select("{$fn}(?, ?, ?)", [$organizationId, $positionId, $search]);
     }
 
 
