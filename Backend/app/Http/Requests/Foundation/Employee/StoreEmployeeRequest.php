@@ -26,17 +26,18 @@ class StoreEmployeeRequest extends FormRequest
             'marital' => ['required', Rule::enum(MaritalEnum::class)],
             'religion' => ['required'],
             'employmentType' => ['required', Rule::enum(EmploymentTypeEnum::class)],
-            /** 
+            'salary' => ['required', 'numeric'],
+            /**
              * @format date
              * @example 2024-12-23
              * */
             'birthAt' => ['required', 'date'],
-            /** 
+            /**
              * @format date
              * @example 2024-12-23
              * */
             'hiredStartAt' => ['required', 'date'],
-            /** 
+            /**
              * @format date
              * @example 2024-12-23
              * */

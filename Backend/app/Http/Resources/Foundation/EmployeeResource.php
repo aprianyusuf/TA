@@ -18,7 +18,7 @@ class EmployeeResource extends JsonResource
         if (collect($this->resource)->get('timezone') !== null) {
             $timezone = new DateTimeZone(collect($this->resource)->get('timezone'));
             $datetime = new DateTime('now', $timezone);
-    
+
             $offsetInHours = $timezone->getOffset($datetime) / 60 / 60;
         }
 
@@ -33,7 +33,8 @@ class EmployeeResource extends JsonResource
             'position' => collect($this->resource)->get('position'),
             /** @var int */
             'position_id' => collect($this->resource)->get('position_id'),
-            
+            'salary' => collect($this->resource)->get('salary'),
+
             $this->mergeWhen(collect($this->resource)->get('superior_first_name') != null, [
                 'superior_name' => collect($this->resource)->get('superior_first_name') . ' '. collect($this->resource)->get('superior_last_name'),
                 'superior_position' => collect($this->resource)->get('superior_position'),
@@ -58,26 +59,26 @@ class EmployeeResource extends JsonResource
                 'religion' => collect($this->resource)?->get('religion'),
             ]),
             $this->mergeWhen(collect($this->resource)?->get('birth_at') != null, [
-                /** 
+                /**
                  * @format date
                  * @example 2024-12-23
                  * */
                 'birth_at' => collect($this->resource)?->get('birth_at'),
             ]),
             $this->mergeWhen(collect($this->resource)?->get('hired_start_at') != null, [
-                /** 
+                /**
                  * @format date
                  * */
                 'hired_start_at' => collect($this->resource)?->get('hired_start_at'),
             ]),
             $this->mergeWhen(collect($this->resource)?->get('hired_end_at') != null, [
-                /** 
+                /**
                  * @format date
                  * */
                 'hired_end_at' => collect($this->resource)?->get('hired_end_at'),
             ]),
             $this->mergeWhen(collect($this->resource)?->get('identity_number') != null, [
-                /** 
+                /**
                  * @format date
                  * */
                 'identity_number' => collect($this->resource)?->get('identity_number'),
