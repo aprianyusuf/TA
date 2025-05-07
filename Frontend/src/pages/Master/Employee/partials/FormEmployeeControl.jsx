@@ -17,7 +17,7 @@ export const PositionControl = () => {
 	const { data: dataPosition, isLoading: isLoadingPosition } = useCustomQuery({
 		api: PositionApi.getAll,
 		queryKey: ["positions", { search }],
-		queryParams: { search },
+		queryParams: { search, size: 999 },
 	});
 
 	return (
