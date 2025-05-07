@@ -61,11 +61,35 @@ class PayrollPeriodApiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'start_at' => ['required', 'date'],
-            'end_at' => ['required', 'date'],
-            'payroll_at' => ['required', 'date'],
-            'year' => ['required', 'int'],
-            'month' => ['required', 'int'],
+            /**
+             * @body
+             * @default 05-01-2025
+             * @example 05-01-2025
+             * @description Start date of the payroll period
+             */
+            'start_at'              => ['required', 'date'],
+            /**
+             * @default 05-31-2025
+             * @example 05-31
+             * @description End date of the payroll period
+             */
+            'end_at'                => ['required', 'date'],
+            /**
+             * @default 05-28-2025
+             */
+            'payroll_at'            => ['required', 'date'],
+            /**
+             * @default 2025
+             */
+            'year'                  => ['required', 'int'],
+            /**
+             * @default 5
+             */
+            'month'                 => ['required', 'int'],
+            /**
+             * @default 1
+             */
+            'is_generate_payrolls ' => ['boolean'],
         ]);
 
         $data = $this->payrollPeriodService->store($request);
@@ -79,11 +103,11 @@ class PayrollPeriodApiController extends Controller
     public function update(Request $request, $payrollPeriodId)
     {
         $request->validate([
-            'start_at' => ['required', 'date'],
-            'end_at' => ['required', 'date'],
+            'start_at'   => ['required', 'date'],
+            'end_at'     => ['required', 'date'],
             'payroll_at' => ['required', 'date'],
-            'year' => ['required', 'int'],
-            'month' => ['required', 'int'],
+            'year'       => ['required', 'int'],
+            'month'      => ['required', 'int'],
         ]);
 
         $data = $this->payrollPeriodService->update($request, $payrollPeriodId);

@@ -18,7 +18,7 @@ class PayrollPeriodSeeder extends Seeder
         $users          = DB::query()->from('users')->where('organization_id', $organization->id)->select()->get();
         $pastYearMonths = [];
         for ($i = 11; $i >= 0; $i--) {
-            $monthDate        = Carbon::today()->startOfMonth()->subMonth($i);
+            $monthDate        = Carbon::today()->startOfMonth()->subMonth($i+1);
             $pastYearMonths[] = [
                 'month' => $monthDate->month, // e.g. "Jan"
                 'year'  => $monthDate->year,

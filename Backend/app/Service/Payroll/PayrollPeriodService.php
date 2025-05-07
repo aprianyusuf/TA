@@ -1,11 +1,12 @@
 <?php
 namespace App\Service\Payroll;
 
-use App\Utils\Enums\PayrollStatusEnum;
-use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use App\Utils\Enums\PayrollStatusEnum;
+use Illuminate\Database\Query\JoinClause;
 
 class PayrollPeriodService
 {
@@ -40,15 +41,17 @@ class PayrollPeriodService
                 DB::raw('COUNT(p.id) as payroll_total'),
                 DB::raw('SUM(p.net_pay) as total_net_pay'),
             ], $statusCounts));
-
-        $data = $query
-            ->when(! is_null($payrollPeriodId), function ($subQuery) use($request) {
+        $count = $query->count();
+        $data  = $query
+            ->when(is_null($payrollPeriodId), function ($subQuery) use ($request) {
                 $subQuery->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
                     ->limit($request->get('size', 10));
             })
             ->get();
-        $count = $data->count();
-
+        Log::debug('Payroll Periods', [
+            'query' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+        ]);
         return [$data, $count];
     }
 
@@ -66,7 +69,8 @@ class PayrollPeriodService
 
     public function store(Request $request)
     {
-        $id = Str::ulid();
+        $auth = $request->decoded;
+        $id   = Str::ulid();
 
         DB::table('payroll_periods')->insert([
             'id'              => $id,
@@ -77,6 +81,10 @@ class PayrollPeriodService
             'end_at'          => $request->end_at,
             'payroll_at'      => $request->payroll_at,
         ]);
+
+        if (! is_null($request->is_generate_payroll) && $request->is_generate_payroll) {
+            $this->payrollService->generatePayrolls($auth['organization']['id'], $request, $id);
+        }
 
         return DB::table('payroll_periods')->where('id', $id)->first();
     }
@@ -150,14 +158,16 @@ class PayrollPeriodService
         return null;
     }
 
-    public function generatePayrolls($organizationId, Request $request)
+    public function generatePayrolls($organizationId, Request $request, $payrollPeriodId = null)
     {
-        $payrollPeriod = $this->getCurrentPayrollPeriod($organizationId);
-        if (! $payrollPeriod) {
-            $payrollPeriodId = $this->createNewPayrollPeriod($organizationId);
-            $payrollPeriod   = DB::table('payroll_periods')
-                ->where('id', $payrollPeriodId)
-                ->first();
+        if ($payrollPeriodId) {
+            $payrollPeriod = $this->getCurrentPayrollPeriod($organizationId);
+            if (! $payrollPeriod) {
+                $payrollPeriodId = $this->createNewPayrollPeriod($organizationId);
+                $payrollPeriod   = DB::table('payroll_periods')
+                    ->where('id', $payrollPeriodId)
+                    ->first();
+            }
         }
 
         // Fetch employees who do NOT have payrolls assigned in the current payroll period

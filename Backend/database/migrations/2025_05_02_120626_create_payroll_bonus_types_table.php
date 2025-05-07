@@ -18,8 +18,10 @@ return new class extends Migration
             $table->foreign('organization_id')->references('id')->on('organizations')->cascadeOnDelete();
             $table->string('name')->index();
             $table->string('description')->nullable();
+            $table->float('percentage')->default(0);
             $table->string('value_fixed')->default(false);
             $table->decimal('value', 15, 2)->default(0);
+            $table->boolean('is_paid_by_organization')->default(false);
             $table->string('currency')->default('IDR')->index();
             $table->unsignedTinyInteger('type')->default(PayrollBonusTypeEnum::Bonus)->index();
             $table->timestamps();
