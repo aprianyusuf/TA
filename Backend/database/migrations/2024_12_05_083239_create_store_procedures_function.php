@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         if (config('app.enable_run_migration_store_procedures')) {
-            $store_procedures = ['fn_get_users_position_in_hierarchy.sql'];
+            $store_procedures = ['fn_get_users_position_in_hierarchy_pgsql.sql'];
 
             foreach ($store_procedures as $value) {
                 $sql = file_get_contents(database_path("store-procedures/$value"));
