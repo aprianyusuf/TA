@@ -72,6 +72,10 @@ class PayrollPeriodService
         $auth = $request->decoded;
         $id   = Str::ulid();
 
+        Log::debug('Payroll Period Store', [
+            'request' => $request->all(),
+        ]);
+
         DB::table('payroll_periods')->insert([
             'id'              => $id,
             'organization_id' => $request->decoded['organization']['id'],
@@ -87,6 +91,11 @@ class PayrollPeriodService
         }
 
         return DB::table('payroll_periods')->where('id', $id)->first();
+    }
+
+    public function delete($payrollPeriodId)
+    {
+        return DB::table('payroll_periods')->where('id', $payrollPeriodId)->delete();
     }
 
     public function getPayrollsByPeriod(Request $request)

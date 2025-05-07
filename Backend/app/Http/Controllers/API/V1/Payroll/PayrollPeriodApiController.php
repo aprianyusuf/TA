@@ -100,29 +100,30 @@ class PayrollPeriodApiController extends Controller
     /**
      * Update Payroll Period
      */
-    public function update(Request $request, $payrollPeriodId)
-    {
-        $request->validate([
-            'start_at'   => ['required', 'date'],
-            'end_at'     => ['required', 'date'],
-            'payroll_at' => ['required', 'date'],
-            'year'       => ['required', 'int'],
-            'month'      => ['required', 'int'],
-        ]);
+    // public function update(Request $request, $payrollPeriodId)
+    // {
+    //     $request->validate([
+    //         'start_at'   => ['required', 'date'],
+    //         'end_at'     => ['required', 'date'],
+    //         'payroll_at' => ['required', 'date'],
+    //         'year'       => ['required', 'int'],
+    //         'month'      => ['required', 'int'],
+    //     ]);
 
-        $data = $this->payrollPeriodService->update($request, $payrollPeriodId);
+    //     $data = $this->payrollPeriodService->update($request, $payrollPeriodId);
 
-        return $this->successResponse(data: new PayrollPeriodIndexResource($data));
-    }
+    //     return $this->successResponse(data: new PayrollPeriodIndexResource($data));
+    // }
 
-    /**
-     * Delete Payroll Period
-     */
+    // /**
+    //  * Delete Payroll Period
+    //  */
 
     public function destroy(Request $request, $payrollPeriodId)
     {
-        $this->payrollPeriodService->destroy($request, $payrollPeriodId);
+        if ($this->payrollPeriodService->delete($request, $payrollPeriodId)) {
+            return $this->successResponse(message: 'Payroll Period Deleted');
+        }
 
-        return $this->successResponse(message: 'Payroll Period Deleted');
     }
 }
