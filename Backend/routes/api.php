@@ -160,6 +160,7 @@ Route::prefix('v1')->group(function () {
                 ->group(function () {
                     Route::get('/', 'index')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::MENU_PAYROLL->value)[0]);
                     Route::get('/{id}', 'show')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::SHOW_PAYROLL->value)[0]);
+                    Route::post('/update/{id}', 'update')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_PAYROLL->value)[0]);
                 });
         });
 

@@ -1,10 +1,11 @@
 <?php
 namespace App\Service\Payroll;
 
-use App\Utils\Enums\PayrollBonusTypeEnum;
-use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Utils\Enums\PayrollBonusTypeEnum;
+use Illuminate\Database\Query\JoinClause;
 
 class PayrollService
 {
@@ -69,7 +70,7 @@ class PayrollService
 
                 $payroll->bonuses = (clone $bonusQuery)
                     ->where('pb.type', PayrollBonusTypeEnum::Bonus->value)
-                    ->select(['pb.id', 'pb.value', 'pbt.name as type'])
+                    ->select(['pb.id', 'pb.value', 'pbt.name'])
                     ->get();
 
                 $payroll->bonus_value = (clone $bonusQuery)
@@ -78,7 +79,7 @@ class PayrollService
 
                 $payroll->deductions = (clone $bonusQuery)
                     ->where('pb.type', PayrollBonusTypeEnum::Deduction->value)
-                    ->select(['pb.id', 'pb.value', 'pbt.name as type'])
+                    ->select(['pb.id', 'pb.value', 'pbt.name'])
                     ->get();
 
                 $payroll->deduction_value = (clone $bonusQuery)
@@ -89,6 +90,11 @@ class PayrollService
 
                 return $payroll;
             });
+        Log::debug('PayrollService::getData', [
+            'query'    => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'data'    => $data,
+        ]);
 
         return [$data, $count];
     }
@@ -126,7 +132,7 @@ class PayrollService
         DB::table('payrolls')
             ->where('id', $payrollId)
             ->update([
-                'status' => $request->get('status'),
+                'status'     => $request->get('status'),
                 'updated_at' => now(),
             ]);
 
@@ -136,12 +142,12 @@ class PayrollService
 
         foreach ($request->get('bonuses') as $bonus) {
             DB::table('payroll_bonuses')->insert([
-                'value' => $bonus['value'],
-                'type' => PayrollBonusTypeEnum::Bonus->value,
+                'value'                 => $bonus['value'],
+                'type'                  => PayrollBonusTypeEnum::Bonus->value,
                 'payroll_bonus_type_id' => $bonus['type_id'],
-                'payroll_id' => $payrollId,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'payroll_id'            => $payrollId,
+                'created_at'            => now(),
+                'updated_at'            => now(),
             ]);
         }
 
@@ -151,12 +157,12 @@ class PayrollService
 
         foreach ($request->get('deductions') as $deduction) {
             DB::table('payroll_bonuses')->insert([
-                'value' => $deduction['value'],
-                'type' => PayrollBonusTypeEnum::Deduction->value,
+                'value'                 => $deduction['value'],
+                'type'                  => PayrollBonusTypeEnum::Deduction->value,
                 'payroll_bonus_type_id' => $deduction['type_id'],
-                'payroll_id' => $payrollId,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'payroll_id'            => $payrollId,
+                'created_at'            => now(),
+                'updated_at'            => now(),
             ]);
         }
     }

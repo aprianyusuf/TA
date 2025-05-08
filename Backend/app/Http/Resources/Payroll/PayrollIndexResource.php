@@ -29,14 +29,14 @@ class PayrollIndexResource extends JsonResource
                 return [
                     'id'    => $bonus->id,
                     'value' => $bonus->value,
-                    'type'  => $bonus->payroll_bonus_type_id,
+                    'name'  => $bonus->name,
                 ];
             }),
             'deductions'        => $this->deductions->map(function ($deduction) {
                 return [
                     'id'    => $deduction->id,
                     'value' => number_format($deduction->value, 2, '.', ''),
-                    'type'  => $deduction->payroll_bonus_type_id,
+                    'name'  => $deduction->name,
                 ];
             }),
             'net_pay'           => number_format($this->net_pay, 2, '.', ''),
