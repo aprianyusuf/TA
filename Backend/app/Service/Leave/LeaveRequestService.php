@@ -32,7 +32,7 @@ class LeaveRequestService
         $query = LeaveRequest::query()
             ->where('organization_id', $user['organization']['id']);
 
-        if (! in_array($user['position']['name'], ['HR', 'CEO'])) {
+        if (! in_array($user['position']['name'], ['HR', 'Direktur'])) {
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user['id'])
                     // ->orWhereHas('user', function ($subQuery) use ($user) {
