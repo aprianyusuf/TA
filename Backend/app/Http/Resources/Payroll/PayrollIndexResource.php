@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Resources\Payroll;
 
 use Illuminate\Http\Request;
@@ -27,27 +28,21 @@ class PayrollIndexResource extends JsonResource
             'deduction'         => $this->deduction,
             'bonuses'           => $this->bonuses->map(function ($bonus) {
                 return [
-                    'id'    => $bonus->id,
-                    'value' => $bonus->value,
-                    'name'  => $bonus->name,
+                    'id'         => $bonus->id,
+                    'value'      => number_format($bonus->value, 2, '.', ''),
+                    'name'       => $bonus->name,
                 ];
             }),
             'deductions'        => $this->deductions->map(function ($deduction) {
                 return [
-                    'id'    => $deduction->id,
-                    'value' => number_format($deduction->value, 2, '.', ''),
-                    'name'  => $deduction->name,
+                    'id'         => $deduction->id,
+                    'value'      => number_format($deduction->value, 2, '.', ''),
+                    'name'       => $deduction->name,
                 ];
             }),
             'net_pay'           => number_format($this->net_pay, 2, '.', ''),
             'currency'          => $this->currency,
             'status'            => $this->status,
-            // 'payroll_period'    => [
-            //     'id'   => $this->payroll_period_id,
-            //     'start_date' => $this->payroll_period->start_date,
-            //     'end_date'   => $this->payroll_period->end_date,
-            //     ''
-            // ]
         ];
     }
 }

@@ -57,7 +57,7 @@ class PayrollSeeder extends Seeder
                         'id'                    => Str::ulid(),
                         'payroll_id'            => $payroll->id,
                         'payroll_bonus_type_id' => $bonusType->id,
-                        'value'                 => $bonusvalue,
+                        'percentage'                 => $bonusvalue,
                         'type'                  => PayrollBonusTypeEnum::Bonus->value,
                     ]);
                     $deductionValue = $bonusType->percentage;
@@ -65,7 +65,7 @@ class PayrollSeeder extends Seeder
                         'id'                    => Str::ulid(),
                         'payroll_id'            => $payroll->id,
                         'payroll_bonus_type_id' => $bonusType->id,
-                        'value'                 => $deductionValue,
+                        'percentage'                 => $deductionValue,
                         'type'                  => PayrollBonusTypeEnum::Deduction->value,
                     ]);
                     $totalBonusValue += $bonusvalue;

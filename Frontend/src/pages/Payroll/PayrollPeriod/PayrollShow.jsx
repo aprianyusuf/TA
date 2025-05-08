@@ -91,7 +91,8 @@ const EditPayroll = () => {
 		const payload = {
 			bonuses: data.bonuses.map((v) => ({ ...v, value: +v.value })),
 			deductions: data.deductions.map((v) => ({ ...v, value: +v.value })),
-			status: ""
+			status: "",
+			salary: data.salary
 		};
 
 		onSubmitEditPayroll({ id: payrollid, ...payload });
