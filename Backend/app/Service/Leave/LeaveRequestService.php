@@ -45,6 +45,7 @@ class LeaveRequestService
             ->search($request->search)
             ->filter($request->filter)
             ->sort($request->sort)
+            ->orderBy('status', 'asc')
             ->orderBy('updated_at', 'desc');
 
         $count = $query->count('id');
