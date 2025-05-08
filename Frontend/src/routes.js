@@ -123,7 +123,7 @@ export const ROUTE_PAYROLL = [
 	},
 	{
 		Component: lazy(() => import("@/pages/Payroll/PayrollPeriod/PayrollPreview")),
-		path: "payrollperiod/payrollpreview",
+		path: "payrollperiod/:payrollperiodid/:payrollid",
 		menu: "MD00028",
 		isLazy: true,
 	},

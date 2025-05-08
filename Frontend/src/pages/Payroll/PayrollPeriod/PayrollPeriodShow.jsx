@@ -27,7 +27,7 @@ const columnHelper = createColumnHelper();
 
 const PayrollPeriodShow = () => {
 	const { id } = useParams();
-	
+
 	const { data, isLoading, pagination, setPagination } = useDataTable({
 		api: PayrollApi.getPayrollsByPeriod,
 		queryKey: ["payrollByPeriod", { id }],
@@ -63,31 +63,31 @@ const PayrollPeriodShow = () => {
 					width: "w-44",
 					cell: ({ getValue }) => {
 						const status = getValue();
-					
+
 						let text = "";
 						let bgColor = "";
-					
+
 						switch (status) {
-						case 0:
-							text = "Waiting";
-							bgColor = "bg-gray-400";
-							break;
-						case 1:
-							text = "Already Paid";
-							bgColor = "bg-green-500";
-							break;
-						default:
-							text = "Unknown";
-							bgColor = "bg-gray-200";
+							case 0:
+								text = "Waiting";
+								bgColor = "bg-gray-400";
+								break;
+							case 1:
+								text = "Already Paid";
+								bgColor = "bg-green-500";
+								break;
+							default:
+								text = "Unknown";
+								bgColor = "bg-gray-200";
 						}
 						return (
-						<TableCell>
-							<span className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${bgColor}`}>
-							{text}
-							</span>
-						</TableCell>
+							<TableCell>
+								<span className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${bgColor}`}>
+									{text}
+								</span>
+							</TableCell>
 						);
-                    },
+					},
 				}),
 				columnHelper.accessor("action", {
 					isVisible: isCanEdit,
@@ -95,15 +95,17 @@ const PayrollPeriodShow = () => {
 					cell: ({ row: { original } }) => (
 						<TableCell className="flex justify-center gap-2">
 							{isCanEdit ? (
-								<Button asChild className="bg-yellow-400 p-2" variant="link">
+								<Button asChild className="p-2 bg-yellow-400" variant="link">
 									<Link to={`edit/${original.id}`}>
-										<Edit className="size-4 text-white" />
+										<Edit className="text-white size-4" />
 									</Link>
 								</Button>
 							) : null}
-								<Button className="bg-gray-500 p-2" title="print">
-                                    <Printer size={16}/>
-                                </Button>
+							<Button className="p-2 bg-gray-500" title="print">
+								<Link to={`${original.id}`}>
+									<Printer size={16} />
+								</Link>
+							</Button>
 						</TableCell>
 					),
 				}),
@@ -113,10 +115,10 @@ const PayrollPeriodShow = () => {
 
 	return (
 		<>
-			<Tabs defaultValue="table" className="flex h-full w-full flex-col">
+			<Tabs defaultValue="table" className="flex flex-col w-full h-full">
 				<TabsContent value="table">
-					<div className="mb-4 flex items-center justify-start">
-						<h2 className="text-xl font-bold ml-5">Payroll Management</h2>
+					<div className="flex items-center justify-start mb-4">
+						<h2 className="ml-5 text-xl font-bold">Payroll Management</h2>
 					</div>
 					<Table
 						columns={columns({
