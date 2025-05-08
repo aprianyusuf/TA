@@ -83,7 +83,7 @@ const AddEmployee = () => {
 							employment_type: null,
 							salary: null,
 						}}
-						schema={AddEmployeeSchema}
+					schema={AddEmployeeSchema}
 						className="flex flex-col gap-3"
 					>
 						<div className="flex flex-col gap-2 md:flex-row">

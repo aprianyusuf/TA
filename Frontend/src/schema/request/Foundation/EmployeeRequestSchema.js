@@ -21,6 +21,7 @@ export const AddEmployeeSchema = Yup.object().shape({
 	report_to_id: Yup.string().nullable(),
 	employee_id: Yup.string().nullable(),
 	identity_number: Yup.string().required("* Filled is required"),
+	salary: Yup.number().required("* Filled is required"),
 	birth_at: Yup.date().required("* Filled is required"),
 	hired_start_at: Yup.date().required("* Filled is required"),
 	hired_end_at: Yup.date()

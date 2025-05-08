@@ -20,6 +20,9 @@ import {
 } from "@/services/helper";
 import PreviewTimesheet from "@/pages/Timesheet/MonthlyTimesheet/partials/PreviewTimesheet";
 import PayrollPeriodApi from "@/apis/v1/PayrollApi/PayrollPeriodApi";
+import { AddPayrollPeriodSchema } from "@/schema/request/Payroll/PayrollRequestSchema";
+import SelectControl from "@/components/moleculs/Control/SelectControl";
+import CheckboxControl from "@/components/moleculs/Control/CheckboxControl";
 
 const ModalAddPeriod = ({
 	handleFormOpen = () => {},
@@ -33,55 +36,33 @@ const ModalAddPeriod = ({
 
 	const queryClient = useQueryClient();
 
-	const { onSubmit: onSubmitPayrollPeriod, isLoading: isLoadingSubmitPayrollPeriod } =
-		useCustomMutation({
-			api:
-				PayrollPeriodApi.createPayrollPeriod,
-			onSuccess: (res) => {
-				queryClient.setQueryData(["payrollPeriod"], {
-					data: res.data,
-				});
-				handleFormOpen({ isOpen: false });
-			},
-			onError: (err) => {
-				toast.error(err.message);
-			},
-			invalidateQueries: [["payrollPeriod", { id: state?.id }]],
-		});
+	const { onSubmit: onSubmitPayrollPeriod, isLoading: isLoadingSubmitPayrollPeriod } = 
+  useCustomMutation({
+    api: PayrollPeriodApi.createPayrollPeriod, // This should be your API call
+    onSuccess: (res) => {
+      queryClient.setQueryData(["payrollPeriod"], { data: res.data });
+      handleFormOpen({ isOpen: false }); // Close the form after success
+    },
+    onError: (err) => {
+      toast.error(err.message); // Show error message on failure
+    },
+    invalidateQueries: [["payrollPeriod", { id: state?.id }]],
+  });
 
-	const handleSubmit = (data, e) => {
-		const payload = {
-			start_date_at: format(
-				add(
-					parse(
-						format(data.start_date_at, "yyyy-MM-dd") + " " + data.start_time_at,
-						"yyyy-MM-dd HH:mm",
-						new Date(),
-					),
-					// { hours: getUTCOffsetInHours(data.timezone) },
-				),
-				"yyyy-MM-dd",
-			),
-			end_date_at: format(
-				add(
-					parse(
-						format(data.end_date_at, "yyyy-MM-dd") + " " + data.end_time_at,
-						"yyyy-MM-dd HH:mm",
-						new Date(),
-					),
-				),
-				"yyyy-MM-dd",
-			),
-			description: "test",
-			status: e.nativeEvent.submitter.value === "submit" ? 1 : 0,
-		};
-
-		if (detailState.type === 0 && type !== 0) {
-			payload.id = state.id;
-		}
-
-		onSubmitPayrollPeriod(payload, e);
-	};
+        const handleSubmit = (data, e) => {
+            const payload = {
+                month: data.month,
+                year: data.year,
+                start_date: data.start_date,
+                end_date: data.end_date,
+                is_generate_payrolls: data.is_generate_payrolls, // Include this field in the payload
+            };
+            
+            // Use the correct mutation handler here
+            onSubmitPayrollPeriod(payload, e);
+        };
+        
+        
 
     const PeriodDatePicker = () => {
         const { watch, setValue } = useFormContext();
@@ -142,77 +123,90 @@ const ModalAddPeriod = ({
             </div>
         );
     };
+    
+    const months = [
+        { id: 1, name: "January" },
+        { id: 2, name: "February" },
+        { id: 3, name: "March" },
+        { id: 4, name: "April" },
+        { id: 5, name: "May" },
+        { id: 6, name: "June" },
+        { id: 7, name: "July" },
+        { id: 8, name: "August" },
+        { id: 9, name: "September" },
+        { id: 10, name: "October" },
+        { id: 11, name: "November" },
+        { id: 12, name: "December" },
+    ];
+    
+    const years = Array.from({ length: 10 }, (_, i) => {
+        const year = new Date().getFullYear() - 5 + i;
+        return { id: year, name: year.toString() };
+    });
+    
+    const [monthData] = useState(months);
+    const [yearData] = useState(years);
+    
 
 	return (
 		<>
-			<HookFormProvider
-				defaultValues={{
-					start_date_at:
-						type === 0 ? state?.startDateAt || new Date() : state.startDateAt,
-					end_date_at:
-						type === 0 ? state?.endDateAt || new Date() : state.endDateAt,
-					description: type === 0 ? null : state.description,
-				}}
-				schema={TimesheetSchema}
-				onSubmit={handleSubmit}
-				className="flex-grow"
-			>
-				<div className="my-2 flex flex-col gap-2">
-                    <span className="font-normal">Year</span>
-                    <select
-                        name="year"
-                        className="rounded-md border border-gray-300 p-2"
-                    >
-                        <option value="">Select year</option>
-                        {Array.from({ length: 21 }, (_, i) => 2020 + i).map((year) => (
-                            <option key={year} value={year}>{year}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="my-2 flex flex-col gap-2">
-                    <span className="font-normal">Month</span>
-                    <select
-                        name="month"
-                        className="rounded-md border border-gray-300 p-2"
-                    >
-                        <option value="">Select month</option>
-                        {[
-                            "January", "February", "March", "April", "May", "June",
-                            "July", "August", "September", "October", "November", "December"
-                        ].map((month, index) => (
-                            <option key={index} value={index + 1}>{month}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="my-2 flex flex-col gap-2">
-					<span className="font-normal">Start at - End at</span>
-					<PeriodDatePicker/>
-				</div>
-                <div className="my-2 flex flex-col gap-2">
-                    <PayrollDatePicker/>
-				</div>
-                <div className="my-4">
-                    <label className="inline-flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            name="generate_payrolls"
-                            value={1}
-                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2"
-                        />
-                        <span>Generate Payrolls</span>
-                    </label>
-                </div>
-				<div className="mt-3 flex justify-end gap-2">
-					<Button
-						type="submit"
-						disabled={isLoadingSubmitPayrollPeriod}
-						className="w-36"
-						value="submit"
-					>
-						{isLoadingSubmitPayrollPeriod ? <Spinner /> : "Submit"}
-					</Button>
-				</div>
-			</HookFormProvider>
+        <HookFormProvider
+	onSubmit={handleSubmit}
+	defaultValues={{
+        month: null,
+        year: null,
+        start_date: null,
+        end_date: null,
+        is_generate_payrolls: false, // ✅ this is required
+      }}
+      
+	schema={AddPayrollPeriodSchema}
+	className="flex flex-col gap-3"
+>
+	<SelectControl
+		label="Month"
+		name="month"
+		options={monthData.map((m) => ({
+			value: m.id,
+			label: m.name,
+		}))}
+	/>
+
+	<SelectControl
+		label="Year"
+		name="year"
+		options={yearData.map((y) => ({
+			value: y.id,
+			label: y.name,
+		}))}
+	/>
+
+	<CalendarControl
+		label="Start Date"
+		name="start_date"
+	/>
+
+	<CalendarControl
+		label="End Date"
+		name="end_date"
+	/>
+
+	<CalendarControl
+		label="Payroll at"
+		name="payroll_at"
+	/>
+
+    <CheckboxControl
+        name="is_generate_payrolls"
+        label="Generate employee payrolls?"
+        />
+
+	<div className="flex justify-end">
+		<Button disabled={isLoadingSubmitPayrollPeriod} className="w-40">
+			{isLoadingSubmitPayrollPeriod ? <Spinner /> : "Add Period"}
+		</Button>
+	</div>
+</HookFormProvider>
 		</>
 	);
 };

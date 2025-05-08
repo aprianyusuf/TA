@@ -1,69 +1,83 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { format, sub } from "date-fns";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 
-import EmployeeApi from "@/apis/v1/MasterApi/EmployeeApi";
+import OrganizationApi from "@/apis/v1/MasterApi/OrganizationApi";
+import PositionApi from "@/apis/v1/MasterApi/PositionApi";
 import { Spinner } from "@/components/atoms/Spinner";
-import DateTimeControl from "@/components/moleculs/Control/DateTimeControl";
 import InputControl from "@/components/moleculs/Control/InputControl";
-import SelectControl from "@/components/moleculs/Control/SelectControl";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { useCustomMutation } from "@/hooks/useCustomMutation";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
 import HookFormProvider from "@/providers/HookFormProvider";
-import { MaritalOptions, ReligionOptions } from "@/schema/options";
-import { AddEmployeeSchema } from "@/schema/request/Foundation/EmployeeRequestSchema";
+import { AddPositionSchema } from "@/schema/request/Foundation/PositionRequestSchema";
 import CheckAuthorization from "@/templates/CheckAuthorization";
 import NotFound from "@/templates/NotFound";
-import { EmploymentTypeControl, HiredDateControl, PositionControl, SuperiorControl } from "@/pages/Master/Employee/partials/FormEmployeeControl";
 import PayrollApi from "@/apis/v1/PayrollApi/PayrollApi";
 
-const PayrollShow = () => {
-	const { id } = useParams();
+const EditPayroll = () => {
+	const { payrollperiodid, payrollid } = useParams();
 	const navigate = useNavigate();
-	
+	// const [schema, setSchema] = useState(() => AddPositionSchema({}));
+
 	const {
-		data: detailEmployee,
-		isLoading: isLoadingDetailEmployee,
-		error: errorDetailEmployee,
+		data: detailPayroll,
+		isLoading: isLoadingDetailPayroll,
+		error: errorDetailPayroll,
 	} = useCustomQuery({
-		api: EmployeeApi.show,
-		queryKey: ["employee", { id }],
-		queryParams: { id },
+		api: PayrollApi.show,
+		queryKey: ["payroll-show", { payrollperiodid, payrollid }],
+		queryParams: { payrollperiodid, payrollid },
 	});
 
-	const { onSubmit: onSubmitEditEmployee, isLoading: isLoadingEditEmployee } =
+	// const {
+	// 	data: organizationPermission,
+	// 	isLoading: isLoadingOrganizationPermission,
+	// } = useCustomQuery({
+	// 	api: OrganizationApi.getPermission,
+	// 	queryKey: "organizationPermission",
+	// });
+
+	// useEffect(() => {
+	// 	if (!isLoadingOrganizationPermission) {
+	// 		setSchema(
+	// 			AddPositionSchema(
+	// 				organizationPermission.data.reduce((acc, item) => {
+	// 					acc[item.code] = {
+	// 						value: false,
+	// 						name: item.name,
+	// 						group: item.moduleName,
+	// 					};
+	// 					return acc;
+	// 				}, {}),
+	// 			),
+	// 		);
+	// 	}
+	// }, [isLoadingOrganizationPermission]);
+
+	const { onSubmit: onSubmitEditPayroll, isLoading: isLoadingEditPayroll } =
 		useCustomMutation({
-			api: EmployeeApi.update,
-			invalidateQueries: [
-				"employees",
-				"employeeHierarchy",
-				["employee", { id }],
-			],
+			api: PayrollApi.update,
+			invalidateQueries: ["payroll", ["payroll", { payrollid }]],
 			onError: (res) => {
 				toast.error(res.message);
 			},
 			onSuccess: (res) => {
 				toast.success(res.message);
-				navigate(-1);
+				navigate("/master/position");
 			},
 		});
 
 	const handleSubmit = async (data, e) => {
-		data.birth_at = format(data.birth_at, "yyyy-MM-dd");
-		data.hired_start_at = format(data.hired_start_at, "yyyy-MM-dd");
+		const payload = {
+		};
 
-		if (data.hired_end_at) {
-			data.hired_end_at = format(data.hired_end_at, "yyyy-MM-dd");
-		}
-
-		onSubmitEditEmployee(data, e);
+		onSubmitEditPayroll(payload, e);
 	};
 
-	if (isLoadingDetailEmployee) {
+	if (isLoadingDetailPayroll) {
 		return (
 			<div className="flex h-full w-full items-center justify-center">
 				<Spinner />
@@ -71,88 +85,44 @@ const PayrollShow = () => {
 		);
 	}
 
-	if (errorDetailEmployee) {
-		return <NotFound message={errorDetailEmployee.message} />;
-	}
+	// if (errorDetailPosition) {
+	// 	return <NotFound message="Position not found" />;
+	// }
 
 	return (
 		<>
 			<Card className="p-2">
 				<CardHeader className="p-6">
-					<CardTitle>Edit Employee</CardTitle>
+					<CardTitle>Edit Payroll</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<HookFormProvider
 						onSubmit={handleSubmit}
 						defaultValues={{
-							id,
-							first_name: detailEmployee.data.firstName,
-							last_name: detailEmployee.data.lastName,
-							position_id: detailEmployee.data.positionId,
-							report_to_id: detailEmployee.data?.reportToId || null,
-							religion: detailEmployee.data.religion,
-							marital: detailEmployee.data.marital,
-							identity_number: detailEmployee.data.identityNumber,
-							birth_at: detailEmployee.data.birthAt,
-							hired_start_at: detailEmployee.data.hiredStartAt,
-							hired_end_at: detailEmployee.data.hiredEndAt,
-							employment_type: detailEmployee.data.employmentType,
-						}}
-						schema={AddEmployeeSchema}
+							employee_id:null,
+							payroll_period_id:payrollperiodid,
+							salary:5000000,
+							bonus:0,
+							deduction:0,
+							net_pay:0,
+							status:'okay',
+						}
+						}
+						// schema={schema}
 						className="flex flex-col gap-3"
 					>
-						<div className="flex gap-2">
-							<InputControl label="First Name" name="first_name" />
-							<InputControl label="Last Name" name="last_name" />
-						</div>
-
-						<div className="flex gap-2">
-							<InputControl label="Identity Number" name="identity_number" />
-							<DateTimeControl
-								label="Birth Date"
-								name="birth_at"
-								dateFormat="dd/MM/yyyy"
-								datePickerOptions={{
-									showYearDropdown: true,
-									yearDropdownItemNumber: 55,
-									minDate: sub(new Date(), { years: 55 }),
-									maxDate: sub(new Date(), { years: 17 }),
-								}}
-							/>
-						</div>
-
-						<div className="flex gap-2">
-							<SelectControl
-								name={"marital"}
-								label={"Marital"}
-								options={MaritalOptions.map((v) => ({
-									label: v,
-									value: v,
-								}))}
-							/>
-							<SelectControl
-								name={"religion"}
-								label={"Religion"}
-								options={ReligionOptions.map((v) => ({
-									label: v,
-									value: v,
-								}))}
-							/>
-						</div>
-
-						<div className="flex gap-2">
-							<PositionControl />
-							<SuperiorControl />
-						</div>
-
-						<div className="flex gap-2">
-							<EmploymentTypeControl />
-							<HiredDateControl />
-						</div>
+						<InputControl label={'Name'} name={'employee_id'} />
+						{/* <InputControl label={'Payroll Period'} name={'payroll_period_id'}/> */}
+						<InputControl label={'Salary'} name={'salary'}/>
+						<InputControl label={'Bonus'} name={'bonus'}/>
+						<InputControl label={'Deduction'} name={'deduction' }/>
+						<InputControl label={'THP' } name={'net_pay' }/>
+						<InputControl label={'Status' } name={'status' }/>
+						
 
 						<div className="flex justify-end">
-							<Button disabled={isLoadingEditEmployee} className="w-40">
-								{isLoadingEditEmployee ? <Spinner /> : "Update Employee"}
+							<Button disabled={isLoadingEditPayroll} className="w-40">
+								{isLoadingEditPayroll ? <Spinner /> : "Update Payroll"}
 							</Button>
 						</div>
 					</HookFormProvider>
@@ -163,6 +133,6 @@ const PayrollShow = () => {
 };
 
 export default CheckAuthorization({
-	Component: PayrollShow,
-	menu: "MD00025",
+	Component: EditPayroll,
+	menu: "MD00009",
 });

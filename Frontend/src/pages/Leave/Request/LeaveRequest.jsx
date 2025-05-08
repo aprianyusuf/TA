@@ -102,21 +102,21 @@ const LeaveRequest = () => {
 					let bgColor = "";
 
 					switch (status) {
-						case 1:
+						case 0:
 							text = "Waiting";
 							bgColor = "bg-gray-400";
 							break;
-						case 2:
+						case 1:
 							text = "Approve";
 							bgColor = "bg-green-500";
+							break;
+						case 2:
+							text = "Canceled";
+							bgColor = "bg-orange-500";
 							break;
 						case 3:
 							text = "Reject";
 							bgColor = "bg-red-500";
-							break;
-						case 4:
-							text = "Abort";
-							bgColor = "bg-orange-500";
 							break;
 						default:
 							text = "Unknown";
@@ -137,7 +137,7 @@ const LeaveRequest = () => {
 				header: <TableHeader className={"text-center"}>Action</TableHeader>,
 				cell: ({ row: { original } }) => (
 					<TableCell className="flex justify-center gap-2">
-						{["HR", "CEO"].includes(userPosition) ? (
+						{["HR", "Direktur"].includes(userPosition) ? (
 							<Button
 								className="p-2"
 								onClick={() =>
