@@ -1,10 +1,11 @@
 <?php
 namespace App\Http\Controllers\API\V1\Payroll;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Payroll\PayrollPeriodIndexResource;
-use App\Service\Payroll\PayrollPeriodService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Service\Payroll\PayrollPeriodService;
+use App\Http\Resources\Payroll\PayrollPeriodIndexResource;
 
 class PayrollPeriodApiController extends Controller
 {
@@ -87,9 +88,9 @@ class PayrollPeriodApiController extends Controller
             /**
              * @default 1
              */
-            'is_generate_payrolls ' => ['boolean'],
+            'isGeneratePayrolls' => ['boolean'],
         ]);
-
+        Log::debug('Payroll Period Store', $request->all());
         if($data=$this->payrollPeriodService->store($request)) {
             return $this->successResponse(message: 'Payroll Period Created');
         }

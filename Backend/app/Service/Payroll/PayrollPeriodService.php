@@ -74,7 +74,7 @@ class PayrollPeriodService
             'end_at'          => $request->endAt,
             'payroll_at'      => $request->payrollAt,
         ])) {
-            if (! is_null($request->is_generate_payrolls) && $request->is_generate_payrolls) {
+            if (! is_null($request->isGeneratePayrolls) && $request->isGeneratePayrolls) {
                 $this->generatePayrolls($auth['organization']['id'], $id);
             }
         }
@@ -218,7 +218,7 @@ class PayrollPeriodService
                     'id'                    => Str::ulid(),
                     'payroll_id'            => $payroll->id,
                     'payroll_bonus_type_id' => $bonusType->id,
-                    'percentage'                 => $bonusType->percentage,
+                    'percentage'            => $bonusType->percentage,
                     'type'                  => PayrollBonusTypeEnum::Bonus->value,
                 ]);
                 if ($bonusType->is_paid_by_organization) {
@@ -227,7 +227,7 @@ class PayrollPeriodService
                         'id'                    => Str::ulid(),
                         'payroll_id'            => $payroll->id,
                         'payroll_bonus_type_id' => $bonusType->id,
-                        'percentage'                 => $bonusType->percentage,
+                        'percentage'            => $bonusType->percentage,
                         'type'                  => PayrollBonusTypeEnum::Deduction->value,
                     ]);
                 }
@@ -238,7 +238,7 @@ class PayrollPeriodService
                     'id'                    => Str::ulid(),
                     'payroll_id'            => $payroll->id,
                     'payroll_bonus_type_id' => $bonusType->id,
-                    'percentage'                 => $bonusType->percentage,
+                    'percentage'            => $bonusType->percentage,
                     'type'                  => PayrollBonusTypeEnum::Deduction->value,
                 ]);
                 if ($bonusType->is_paid_by_organization) {
@@ -247,7 +247,7 @@ class PayrollPeriodService
                         'id'                    => Str::ulid(),
                         'payroll_id'            => $payroll->id,
                         'payroll_bonus_type_id' => $bonusType->id,
-                        'percentage'                 => $bonusType->percentage,
+                        'percentage'            => $bonusType->percentage,
                         'type'                  => PayrollBonusTypeEnum::Bonus->value,
                     ]);
                 }
