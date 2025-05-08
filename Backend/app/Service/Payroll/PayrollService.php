@@ -1,11 +1,11 @@
 <?php
 namespace App\Service\Payroll;
 
+use App\Utils\Enums\PayrollBonusTypeEnum;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Utils\Enums\PayrollBonusTypeEnum;
-use Illuminate\Database\Query\JoinClause;
 
 class PayrollService
 {
@@ -93,7 +93,7 @@ class PayrollService
         Log::debug('PayrollService::getData', [
             'query'    => $query->toSql(),
             'bindings' => $query->getBindings(),
-            'data'    => $data,
+            'data'     => $data,
         ]);
 
         return [$data, $count];
@@ -129,42 +129,59 @@ class PayrollService
 
     public function update(Request $request, string $payrollId, string $payrollPeriodId)
     {
-        DB::table('payrolls')
-            ->where('id', $payrollId)
-            ->update([
-                'status'     => $request->get('status'),
-                'updated_at' => now(),
-            ]);
-
-        DB::table('payroll_bonuses')
-            ->where('payroll_id', $payrollId)
-            ->delete();
-
-        foreach ($request->get('bonuses') as $bonus) {
-            DB::table('payroll_bonuses')->insert([
-                'value'                 => $bonus['value'],
-                'type'                  => PayrollBonusTypeEnum::Bonus->value,
-                'payroll_bonus_type_id' => $bonus['type_id'],
-                'payroll_id'            => $payrollId,
-                'created_at'            => now(),
-                'updated_at'            => now(),
-            ]);
+        try {
+            DB::beginTransaction();
+            //code...
+            $payroll = DB::table('payrolls')->where('id', $payrollId)->first();
+            if (is_null($payroll)) {
+                return false;
+            }
+            DB::table('payroll_bonuses')
+                ->where('payroll_id', $payrollId)
+                ->delete();
+            $totalBonusValue     = 0;
+            $totalDeductionValue = 0;
+            foreach ($request->get('bonuses') as $bonus) {
+                $bonusValue = $bonus['percentage'] * $request->get('salary') / 100;
+                DB::table('payroll_bonuses')->insert([
+                    'percentage'            => $bonus['percentage'],
+                    'value'                 => $bonusValue,
+                    'type'                  => PayrollBonusTypeEnum::Bonus->value,
+                    'payroll_bonus_type_id' => $bonus['type_id'],
+                    'payroll_id'            => $payrollId,
+                    'created_at'            => now(),
+                    'updated_at'            => now(),
+                ]);
+                $totalBonusValue += $bonusValue;
+            }
+            foreach ($request->get('deductions') as $deduction) {
+                $deductionValue = $deduction['percentage'] * $request->get('salary') / 100;
+                DB::table('payroll_bonuses')->insert([
+                    'percentage'            => $deduction['percentage'],
+                    'value'                 => $deductionValue,
+                    'type'                  => PayrollBonusTypeEnum::Deduction->value,
+                    'payroll_bonus_type_id' => $deduction['type_id'],
+                    'payroll_id'            => $payrollId,
+                    'created_at'            => now(),
+                    'updated_at'            => now(),
+                ]);
+                $totalDeductionValue += $deductionValue;
+            }
+            DB::table('payrolls')
+                ->where('id', $payrollId)
+                ->update([
+                    'bonus'      => $totalBonusValue,
+                    'deduction'  => $totalDeductionValue,
+                    'net_pay'    => $payroll->salary + $totalBonusValue - $totalDeductionValue,
+                    'updated_at' => now(),
+                ]);
+            DB::commit();
+        } catch (\Throwable $th) {
+            //throw $th;
+            return false;
+            DB::rollBack();
         }
-
-        DB::table('payroll_bonuses')
-            ->where('payroll_id', $payrollId)
-            ->delete();
-
-        foreach ($request->get('deductions') as $deduction) {
-            DB::table('payroll_bonuses')->insert([
-                'value'                 => $deduction['value'],
-                'type'                  => PayrollBonusTypeEnum::Deduction->value,
-                'payroll_bonus_type_id' => $deduction['type_id'],
-                'payroll_id'            => $payrollId,
-                'created_at'            => now(),
-                'updated_at'            => now(),
-            ]);
-        }
+        return true;
     }
 
 }
