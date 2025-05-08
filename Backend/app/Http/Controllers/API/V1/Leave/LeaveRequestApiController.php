@@ -26,7 +26,6 @@ class LeaveRequestApiController extends Controller
     public function index(Request $request)
     {
         [$data, $count] = $this->service->getLeaveRequest($request);
-        // dd($data);
         /**
          * @body array{status: string, code: int, data: LeaveRequestResource[], count: int}
          */
@@ -44,7 +43,7 @@ class LeaveRequestApiController extends Controller
         if ($leaveTypes == null) {
             /**
              * Leave type is not valid
-             * 
+             *
              * @status 400
              * @body ErrorResource
              */
@@ -57,7 +56,7 @@ class LeaveRequestApiController extends Controller
         if (! $validation['valid']) {
             /**
              * Leave request are not allowed
-             * 
+             *
              * @status 406
              * @body ErrorResource
              */
@@ -73,7 +72,7 @@ class LeaveRequestApiController extends Controller
         if ($workingDays > 30) {
             /**
              * Leave request are not allowed
-             * 
+             *
              * @status 406
              * @body ErrorResource
              */
