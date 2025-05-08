@@ -47,10 +47,10 @@ class PayrollSeeder extends Seeder
                 ];
                 DB::table('payrolls')->insert($payroll);
                 $payroll = DB::table('payrolls')->where('id', $payrollId)->first();
+                $totalBonusValue     = 0;
+                $totalDeductionValue = 0;
                 foreach ($payrollBonusTypes as $bonusType) {
-                    $totalBonusValue     = 0;
-                    $totalDeductionValue = 0;
-                    foreach ($payrollBonusTypes as $bonusType) {
+
                         $bonusvalue = $bonusType->percentage * $employee->salary / 100;
                         DB::table('payroll_bonuses')->insert([
                             'id'                    => Str::ulid(),
@@ -69,6 +69,7 @@ class PayrollSeeder extends Seeder
                         ]);
                         $totalBonusValue += $bonusvalue;
                         $totalDeductionValue += $deductionValue;
+
                     }
                     DB::table('payrolls')
                         ->where('id', $payrollId)
@@ -77,8 +78,6 @@ class PayrollSeeder extends Seeder
                             'deduction' => $totalDeductionValue,
                             'net_pay'   => $payroll->salary + $totalBonusValue - $totalDeductionValue,
                         ]);
-
-                }
 
             }
         }
