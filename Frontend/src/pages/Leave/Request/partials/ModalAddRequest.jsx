@@ -7,9 +7,10 @@ import PropTypes from "prop-types";
 import { useFormContext } from "react-hook-form";
 import { toast } from "react-toastify";
 
+import LeaveRequestApi from "@/apis/v1/LeaveApi/LeaveRequestApi";
+import LeaveTypeApi from "@/apis/v1/LeaveApi/LeaveTypeApi";
 import ClientApi from "@/apis/v1/ProjectManagementApi/ClientApi";
 import MonthlyTimesheetApi from "@/apis/v1/TimesheetApi/MonthlyTimesheetApi";
-import LeaveRequestApi from "@/apis/v1/LeaveApi/LeaveRequestApi";
 import { Spinner } from "@/components/atoms/Spinner";
 import CalendarControl from "@/components/moleculs/Control/CalendarControl";
 import InputControl from "@/components/moleculs/Control/InputControl";
@@ -18,17 +19,12 @@ import { Button } from "@/components/ui/Button";
 import { getTimeZones } from "@/configs/constant";
 import { useCustomMutation } from "@/hooks/useCustomMutation";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
+import PreviewTimesheet from "@/pages/Timesheet/MonthlyTimesheet/partials/PreviewTimesheet";
 import HookFormProvider from "@/providers/HookFormProvider";
 import { TimesheetSchema } from "@/schema/request/Timesheet/FormTimesheetSchema";
-import {
-	calculateTimeDifferenceDays,
-	getNearest30Minutes,
-	getUTCOffsetInHours,
-} from "@/services/helper";
+import { calculateTimeDifferenceDays } from "@/services/helper";
 
-import PreviewTimesheet from "@/pages/Timesheet/MonthlyTimesheet/partials/PreviewTimesheet";
 import LeaveTypeControl from "./LeaveTypeControl";
-import LeaveTypeApi from "@/apis/v1/LeaveApi/LeaveTypeApi";
 
 const DateTimesheetControl = () => {
 	const { watch, setValue } = useFormContext();
@@ -130,8 +126,16 @@ const DateTimesheetControl = () => {
 					startTimeAt &&
 					endTimeAt &&
 					calculateTimeDifferenceDays(
-						parse(`${safeFormat(startDateAt)} ${startTimeAt}`, "dd/MM/yyyy HH:mm", new Date()),
-						parse(`${safeFormat(endDateAt)} ${endTimeAt}`, "dd/MM/yyyy HH:mm", new Date()),
+						parse(
+							`${safeFormat(startDateAt)} ${startTimeAt}`,
+							"dd/MM/yyyy HH:mm",
+							new Date(),
+						),
+						parse(
+							`${safeFormat(endDateAt)} ${endTimeAt}`,
+							"dd/MM/yyyy HH:mm",
+							new Date(),
+						),
 					)}
 			</span>
 		</div>
@@ -152,8 +156,7 @@ const ModalRequest = ({
 
 	const { onSubmit: onSubmitRequest, isLoading: isLoadingSubmitRequest } =
 		useCustomMutation({
-			api:
-				LeaveRequestApi.createLeaveRequest,
+			api: LeaveRequestApi.createLeaveRequest,
 			onSuccess: (res) => {
 				queryClient.setQueryData(["timesheetThisMonth"], {
 					data: res.data,
@@ -232,7 +235,7 @@ const ModalRequest = ({
 				className="flex-grow"
 			>
 				<div className="my-2 flex flex-col gap-2">
-                    <LeaveTypeControl />
+					<LeaveTypeControl />
 				</div>
 				<div className="my-2 flex flex-col gap-2">
 					<span className="font-normal">Time</span>
@@ -240,17 +243,17 @@ const ModalRequest = ({
 				</div>
 				<div className="my-2 flex flex-col gap-2">
 					<span className="font-normal">Description</span>
-                    <InputControl
-                        placeholder={"Description"}
-                        name={"description"}
-                        leftAddOn={
-                            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
-                                <Pencil className="size-4" />
-                            </span>
-                        }
-                    className="peer pl-10"
-                    />
-                </div>
+					<InputControl
+						placeholder={"Description"}
+						name={"description"}
+						leftAddOn={
+							<span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
+								<Pencil className="size-4" />
+							</span>
+						}
+						className="peer pl-10"
+					/>
+				</div>
 				<div className="mt-3 flex justify-end gap-2">
 					<Button
 						type="submit"
