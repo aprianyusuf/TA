@@ -53,7 +53,7 @@ const Employee = () => {
 					header: <TableHeader>Email</TableHeader>,
 					width: "w-44",
 					cell: ({ getValue }) => (
-						<TableCell className="w-44 truncate" title={getValue()}>
+						<TableCell className="truncate w-44" title={getValue()}>
 							{getValue()}
 						</TableCell>
 					),
@@ -86,9 +86,9 @@ const Employee = () => {
 					cell: ({ row: { original } }) => (
 						<TableCell className="flex justify-center gap-2">
 							{isCanEdit ? (
-								<Button asChild className="bg-yellow-400 p-2" variant="link">
+								<Button asChild className="p-2 bg-yellow-400" variant="link">
 									<Link to={`edit/${original.id}`}>
-										<Edit className="size-4 text-white" />
+										<Edit className="text-white size-4" />
 									</Link>
 								</Button>
 							) : null}
@@ -98,6 +98,7 @@ const Employee = () => {
 									invalidateQueries={[
 										"employees",
 										["employee", { id: original.id }],
+										"leave-request"
 									]}
 									payload={{ id: original.id }}
 								/>
@@ -111,7 +112,7 @@ const Employee = () => {
 
 	return (
 		<>
-			<Tabs defaultValue="table" className="flex h-full w-full flex-col">
+			<Tabs defaultValue="table" className="flex flex-col w-full h-full">
 				{/* <TabsList className="w-fit">
 					<TabsTrigger value="table" className="w-32">
 						List
@@ -121,8 +122,8 @@ const Employee = () => {
 					</TabsTrigger>
 				</TabsList> */}
 				<TabsContent value="table">
-					<div className="mb-4 flex items-center justify-between">
-						<h2 className="text-xl font-bold ml-5">Employee Management</h2>
+					<div className="flex items-center justify-between mb-4">
+						<h2 className="ml-5 text-xl font-bold">Employee Management</h2>
 						<Button asChild title="Add Employee">
 							<Link to={"add"}>
 								<Plus size={16} className="mr-2" />
@@ -143,7 +144,7 @@ const Employee = () => {
 						total={data?.count}
 					/>
 				</TabsContent>
-				<TabsContent value="hierarchy" className="flex h-full w-full">
+				<TabsContent value="hierarchy" className="flex w-full h-full">
 					<OrganizationDiagram />
 				</TabsContent>
 			</Tabs>

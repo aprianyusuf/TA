@@ -7,6 +7,7 @@ use App\Models\LeaveType;
 use App\Models\User;
 use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -27,6 +28,9 @@ class LeaveRequestService
         $user = $request->decoded;
 
         $query = LeaveRequest::query()
+            ->whereHas('user', function (Builder $builder) {
+                $builder->where('deleted_at', null);
+            })
             ->where('organization_id', $user['organization']['id']);
 
         if (! in_array($user['position']['name'], ['Human Resource', 'Direktur', 'General Manager'])) {
@@ -49,7 +53,7 @@ class LeaveRequestService
         $count = $query->count('id');
 
         $data = $query
-            ->with(['user', 'leaveType'])
+            ->with(['leaveType'])
             ->skip(($request->get('page', 1) - 1) * $request->get('size', 10))
             ->limit($request->get('size', 10))
             ->get();
