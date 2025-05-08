@@ -363,7 +363,7 @@ const LeaveRequest = () => {
 							}
 						>
 							<DialogHeader className={"items center flex-row gap-1"}>
-								<DialogTitle>Leave Request 2</DialogTitle>
+								<DialogTitle>Leave Request</DialogTitle>
 							</DialogHeader>
 							<DetailRequest
 								handleFormOpen={handleDetailOpen}
