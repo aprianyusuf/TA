@@ -249,9 +249,13 @@ class LeaveRequestService
 
     public function createLeaveRequest(StoreLeaveRequest $request, int $duration)
     {
+        $employee = DB::table('employees')
+            ->where('user_id', $request->decoded->get('id'))
+            ->first();
         $leaveRequest = LeaveRequest::query()->create([
             'id'              => Str::ulid(),
             'user_id'         => $request->decoded->get('id'),
+            'employee_id'     => $employee->id,
             'organization_id' => $request->decoded->get("organization")?->get("id"),
             'leave_type_id'   => $request->leaveType,
             'start_date'      => $request->startDate,
