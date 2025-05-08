@@ -34,3 +34,31 @@ if (!function_exists('formatNameToInitials')) {
             ->implode('.');
     }
 }
+//Ampar ampar pisang
+//Pisangku balum masak
+//Masak bigi dihurung bari-bari
+//Masak bigi dihurung bari-bari
+//Manggalepak manggalepok
+//Patah kayu bengkok
+//Bengkok dimakan api
+//apinya cang curupan
+//Bengkok dimakan api
+//apinya cang curupan
+//Nang mana batis kutung
+//Dikitipi dawang
+//Nang mana batis kutung
+//Dikitipi dawang
+//Ampar ampar pisang
+//Pisangku balum masak
+//Masak bigi dihurung bari-bari
+//Masak bigi dihurung bari-bari
+//Manggalepak manggalepok
+//Patah kayu bengkok
+//Bengkok dimakan api
+//apinya cang curupan
+//Bengkok dimakan api
+//apinya cang curupan
+//Nang mana batis kutung
+//Dikitipi dawang
+//Nang mana batis kutung
+//Dikitipi dawang

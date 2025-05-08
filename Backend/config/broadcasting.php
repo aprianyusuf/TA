@@ -80,3 +80,5 @@ return [
     ],
 
 ];
+
+//perbaikan sifat kodingatn
