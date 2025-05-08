@@ -326,25 +326,34 @@ class LeaveRequestService
             return $leaveRequest;
         });
     }
-
-    public function hasPermissionToActOnLeaveRequest(LeaveRequest $leaveRequest, User $user)
+    public function abortLeaveRequest(LeaveRequest $leaveRequest, string $approverId)
     {
-        $validPositions   = ['HR', 'CEO'];
-        $approverPosition = $user ? $user->position : null;
+        return DB::transaction(function () use ($leaveRequest, $approverId) {
+            $leaveRequest->update([
+                'status'       => LeaveRequestStatus::Cancelled,
+                'responded_by' => $approverId,
+                'responded_at' => Carbon::now(),
+                'updated_at'   => Carbon::now(),
+            ]);
 
-        // Log::debug('Leave Acceptance Permission check',
-        //     [
-        //         $approverPosition,
-        //         $leaveRequest->user_id,
-        //         $user->id, $validPositions, in_array($approverPosition, $validPositions),
-        //     ]);
+            return $leaveRequest;
+        });
+    }
 
-        if (in_array($approverPosition->name, $validPositions)) {
-            return true;
-        }
+    public function hasPermissionToActOnLeaveRequest(LeaveRequest $leaveRequest, User $user, $action)
+    {
+        if($action === 'approve' || $action === 'reject') {
+            $validPositions   = ['HR', 'Direktur'];
+            $approverPosition = $user ? $user->position : null;
+            if (in_array($approverPosition->name, $validPositions)) {
+                return true;
+            }
 
-        if ($user->id === User::find($leaveRequest->user_id)->report_to_id) {
-            return true;
+            if ($user->id === User::find($leaveRequest->user_id)->report_to_id) {
+                return true;
+            }
+        }elseif($action === 'cancel'){
+            return $leaveRequest->user_id === $user->id;
         }
 
         return false;
