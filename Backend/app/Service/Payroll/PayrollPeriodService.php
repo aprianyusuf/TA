@@ -204,7 +204,7 @@ class PayrollPeriodService
         }
     }
 
-    public function generatePayrollBonusses($payroll, $employee, $bonusTypeId, $value)
+    public function generatePayrollBonusses($payroll, $employee, $payrollBonusTypes)
     {
         $totalBonusValue     = 0;
         $totalDeductionValue = 0;
@@ -229,7 +229,7 @@ class PayrollPeriodService
             $totalDeductionValue += $deductionValue;
         }
         DB::table('payrolls')
-            ->where('id', $payrollId)
+            ->where('id', $payroll->id)
             ->update([
                 'bonus'     => $totalBonusValue,
                 'deduction' => $totalDeductionValue,
