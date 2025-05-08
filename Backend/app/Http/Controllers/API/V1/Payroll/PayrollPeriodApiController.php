@@ -1,11 +1,11 @@
 <?php
 namespace App\Http\Controllers\API\V1\Payroll;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Payroll\PayrollPeriodIndexResource;
+use App\Service\Payroll\PayrollPeriodService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Service\Payroll\PayrollPeriodService;
-use App\Http\Resources\Payroll\PayrollPeriodIndexResource;
 
 class PayrollPeriodApiController extends Controller
 {
@@ -67,31 +67,27 @@ class PayrollPeriodApiController extends Controller
              * @example 05-01-2025
              * @description Start date of the payroll period
              */
-            'startAt'              => ['required'],
+            'startAt'   => ['required'],
             /**
              * @example 05-31
              * @description End date of the payroll period
              */
-            'endAt'                => ['required'],
+            'endAt'     => ['required'],
             /**
              * @default 05-28-2025
              */
-            'payrollAt'            => ['required'],
+            'payrollAt' => ['required'],
             /**
              * @default 2025
              */
-            'year'                  => ['required', 'int'],
+            'year'      => ['required', 'int'],
             /**
              * @default 5
              */
-            'month'                 => ['required', 'int'],
-            /**
-             * @default 1
-             */
-            'isGeneratePayrolls' => ['boolean'],
+            'month'     => ['required', 'int'],
         ]);
         Log::debug('Payroll Period Store', $request->all());
-        if($data=$this->payrollPeriodService->store($request)) {
+        if ($data = $this->payrollPeriodService->store($request)) {
             return $this->successResponse(message: 'Payroll Period Created');
         }
     }

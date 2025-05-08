@@ -74,9 +74,7 @@ class PayrollPeriodService
             'end_at'          => $request->endAt,
             'payroll_at'      => $request->payrollAt,
         ])) {
-            if (! is_null($request->isGeneratePayrolls) && $request->isGeneratePayrolls) {
-                $this->generatePayrolls($auth['organization']['id'], $id);
-            }
+            $this->generatePayrolls($auth['organization']['id'], $id);
         }
     }
 
@@ -197,11 +195,6 @@ class PayrollPeriodService
                 $payroll = DB::table('payrolls')
                     ->where('id', $payrollId)
                     ->first();
-                // Log::debug('Creating Payroll', [
-                //     'payroll_id'        => $payroll->id,
-                //     'employee_id'       => $employee->employee_id,
-                //     'payroll_period_id' => $payrollPeriod->id,
-                // ]);
                 $this->generatePayrollBonusses($payroll, $employee, $payrollBonusTypes);
             }
         }
@@ -231,7 +224,6 @@ class PayrollPeriodService
                         'type'                  => PayrollBonusTypeEnum::Deduction->value,
                     ]);
                 }
-
             } else {
                 $deductionValue = $bonusType->percentage * $employee->salary / 100;
                 DB::table('payroll_bonuses')->insert([
@@ -242,7 +234,7 @@ class PayrollPeriodService
                     'type'                  => PayrollBonusTypeEnum::Deduction->value,
                 ]);
                 if ($bonusType->is_paid_by_organization) {
-                    $deductionValue = $bonusType->percentage * $employee->salary / 100;
+                    $bonusvalue = $bonusType->percentage * $employee->salary / 100;
                     DB::table('payroll_bonuses')->insert([
                         'id'                    => Str::ulid(),
                         'payroll_id'            => $payroll->id,
