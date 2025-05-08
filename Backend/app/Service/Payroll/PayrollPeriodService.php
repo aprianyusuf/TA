@@ -75,7 +75,7 @@ class PayrollPeriodService
             'payroll_at'      => $request->payrollAt,
         ])) {
             if (! is_null($request->is_generate_payroll) && $request->is_generate_payroll) {
-                $this->payrollService->generatePayrolls($auth['organization']['id'], $request, $id);
+                $this->generatePayrolls($auth['organization']['id'], $id);
             }
         }
     }
@@ -154,7 +154,7 @@ class PayrollPeriodService
         return null;
     }
 
-    public function generatePayrolls($organizationId, Request $request, $payrollPeriodId = null)
+    public function generatePayrolls($organizationId, $payrollPeriodId = null)
     {
         if ($payrollPeriodId) {
             $payrollPeriod = $this->getCurrentPayrollPeriod($organizationId);
@@ -170,6 +170,7 @@ class PayrollPeriodService
         $employees = DB::table('employees as e')
             ->join('users as u', function (JoinClause $join) {
                 $join->on('u.id', '=', 'e.user_id')
+                    ->join('organizations as o', 'o.id', '=', 'u.organization_id')
                     ->where('u.organization_id', '=', 'o.id');
             })
             ->leftJoin('payrolls as p', function ($join) use ($payrollPeriod) {
@@ -209,22 +210,47 @@ class PayrollPeriodService
         $totalBonusValue     = 0;
         $totalDeductionValue = 0;
         foreach ($payrollBonusTypes as $bonusType) {
-            $bonusvalue = $bonusType->percentage * $employee->salary / 100;
-            DB::table('payroll_bonuses')->insert([
-                'id'                    => Str::ulid(),
-                'payroll_id'            => $payroll->id,
-                'payroll_bonus_type_id' => $bonusType->id,
-                'value'                 => $bonusvalue,
-                'type'                  => PayrollBonusTypeEnum::Bonus->value,
-            ]);
-            $deductionValue = $bonusType->percentage * $employee->salary / 100;
-            DB::table('payroll_bonuses')->insert([
-                'id'                    => Str::ulid(),
-                'payroll_id'            => $payroll->id,
-                'payroll_bonus_type_id' => $bonusType->id,
-                'value'                 => $deductionValue,
-                'type'                  => PayrollBonusTypeEnum::Deduction->value,
-            ]);
+            if ($bonusType->type == PayrollBonusTypeEnum::Bonus->value) {
+                $bonusvalue = $bonusType->percentage * $employee->salary / 100;
+                DB::table('payroll_bonuses')->insert([
+                    'id'                    => Str::ulid(),
+                    'payroll_id'            => $payroll->id,
+                    'payroll_bonus_type_id' => $bonusType->id,
+                    'value'                 => $bonusvalue,
+                    'type'                  => PayrollBonusTypeEnum::Bonus->value,
+                ]);
+                if ($bonusType->is_paid_by_organization) {
+                    $deductionValue = $bonusType->percentage * $employee->salary / 100;
+                    DB::table('payroll_bonuses')->insert([
+                        'id'                    => Str::ulid(),
+                        'payroll_id'            => $payroll->id,
+                        'payroll_bonus_type_id' => $bonusType->id,
+                        'value'                 => $deductionValue,
+                        'type'                  => PayrollBonusTypeEnum::Deduction->value,
+                    ]);
+                }
+
+            } else {
+                $deductionValue = $bonusType->percentage * $employee->salary / 100;
+                DB::table('payroll_bonuses')->insert([
+                    'id'                    => Str::ulid(),
+                    'payroll_id'            => $payroll->id,
+                    'payroll_bonus_type_id' => $bonusType->id,
+                    'value'                 => $deductionValue,
+                    'type'                  => PayrollBonusTypeEnum::Deduction->value,
+                ]);
+                if ($bonusType->is_paid_by_organization) {
+                    $deductionValue = $bonusType->percentage * $employee->salary / 100;
+                    DB::table('payroll_bonuses')->insert([
+                        'id'                    => Str::ulid(),
+                        'payroll_id'            => $payroll->id,
+                        'payroll_bonus_type_id' => $bonusType->id,
+                        'value'                 => $deductionValue,
+                        'type'                  => PayrollBonusTypeEnum::Bonus->value,
+                    ]);
+                }
+
+            }
             $totalBonusValue += $bonusvalue;
             $totalDeductionValue += $deductionValue;
         }
@@ -235,6 +261,5 @@ class PayrollPeriodService
                 'deduction' => $totalDeductionValue,
                 'net_pay'   => $payroll->salary + $totalBonusValue - $totalDeductionValue,
             ]);
-
     }
 }

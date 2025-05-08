@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Utils\Enums\PayrollBonusTypeEnum;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class PayrollBonusTypeSeeder extends Seeder
@@ -27,7 +28,7 @@ class PayrollBonusTypeSeeder extends Seeder
                 'value' => null,
                 'is_paid_by_organization' => true,
                 'currency' => 'IDR',
-                'type' => 1,
+                'type' => PayrollBonusTypeEnum::Bonus,
             ],
             [
                 'id' => Str::ulid(),
@@ -39,7 +40,7 @@ class PayrollBonusTypeSeeder extends Seeder
                 'value' => null,
                 'is_paid_by_organization' => true,
                 'currency' => 'IDR',
-                'type' => 1,
+                'type' => PayrollBonusTypeEnum::Bonus,
             ],
             [
                 'id' => Str::ulid(),
@@ -51,7 +52,7 @@ class PayrollBonusTypeSeeder extends Seeder
                 'value' => null,
                 'is_paid_by_organization' => true,
                 'currency' => 'IDR',
-                'type' => 1,
+                'type' => PayrollBonusTypeEnum::Bonus,
             ],
             [
                 'id' => Str::ulid(),
@@ -63,7 +64,7 @@ class PayrollBonusTypeSeeder extends Seeder
                 'value' => null,
                 'is_paid_by_organization' => true,
                 'currency' => 'IDR',
-                'type' => 1,
+                'type' => PayrollBonusTypeEnum::Bonus,
             ],
             [
                 'id' => Str::ulid(),
@@ -75,7 +76,19 @@ class PayrollBonusTypeSeeder extends Seeder
                 'value' => null,
                 'is_paid_by_organization' => true,
                 'currency' => 'IDR',
-                'type' => 1,
+                'type' => PayrollBonusTypeEnum::Bonus,
+            ],
+            [
+                'id' => Str::ulid(),
+                'organization_id' => $organizationId,
+                'name' => 'Tax',
+                'description' => 'Tax',
+                'percentage' => 8,
+                'value_fixed' => false,
+                'value' => null,
+                'is_paid_by_organization' => false,
+                'currency' => 'IDR',
+                'type' => PayrollBonusTypeEnum::Deduction,
             ],
         ];
 
