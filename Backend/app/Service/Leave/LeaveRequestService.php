@@ -1,19 +1,16 @@
 <?php
-
 namespace App\Service\Leave;
 
 use App\Http\Requests\Leave\StoreLeaveRequest;
-use App\Http\Requests\Leave\UpdateLeaveRequest;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\User;
 use App\Utils\Enums\LeaveRequestStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
-use Illuminate\Support\Facades\DB;
-
 
 class LeaveRequestService
 {
@@ -35,10 +32,10 @@ class LeaveRequestService
         if (! in_array($user['position']['name'], ['HR', 'Direktur'])) {
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user['id'])
-                    // ->orWhereHas('user', function ($subQuery) use ($user) {
-                    //     $subQuery->where('report_to_id', $user['id']);
-                    // })
-                    ;
+                // ->orWhereHas('user', function ($subQuery) use ($user) {
+                //     $subQuery->where('report_to_id', $user['id']);
+                // })
+                ;
             });
         }
 
@@ -177,8 +174,8 @@ class LeaveRequestService
         }
 
         return [
-            'used_quota' => $usedQuota,
-            'remaining_quota' => $remainingQuota
+            'used_quota'      => $usedQuota,
+            'remaining_quota' => $remainingQuota,
         ];
     }
 
@@ -306,10 +303,10 @@ class LeaveRequestService
     {
         return DB::transaction(function () use ($leaveRequest, $approverId) {
             $leaveRequest->update([
-                'status'        => LeaveRequestStatus::Approved,
-                'responded_by'  => $approverId,
-                'responded_at'  => Carbon::now(),
-                'updated_at'    => Carbon::now(),
+                'status'       => LeaveRequestStatus::Approved,
+                'responded_by' => $approverId,
+                'responded_at' => Carbon::now(),
+                'updated_at'   => Carbon::now(),
             ]);
 
             return $leaveRequest;
@@ -320,10 +317,10 @@ class LeaveRequestService
     {
         return DB::transaction(function () use ($leaveRequest, $approverId) {
             $leaveRequest->update([
-                'status'        => LeaveRequestStatus::Rejected,
-                'responded_by'  => $approverId,
-                'responded_at'  => Carbon::now(),
-                'updated_at'    => Carbon::now(),
+                'status'       => LeaveRequestStatus::Rejected,
+                'responded_by' => $approverId,
+                'responded_at' => Carbon::now(),
+                'updated_at'   => Carbon::now(),
             ]);
 
             return $leaveRequest;
@@ -332,14 +329,21 @@ class LeaveRequestService
 
     public function hasPermissionToActOnLeaveRequest(LeaveRequest $leaveRequest, User $user)
     {
-        $validPositions = ['HR', 'CEO'];
+        $validPositions   = ['HR', 'CEO'];
         $approverPosition = $user ? $user->position : null;
 
-        if (in_array($approverPosition, $validPositions)) {
+        // Log::debug('Leave Acceptance Permission check',
+        //     [
+        //         $approverPosition,
+        //         $leaveRequest->user_id,
+        //         $user->id, $validPositions, in_array($approverPosition, $validPositions),
+        //     ]);
+
+        if (in_array($approverPosition->name, $validPositions)) {
             return true;
         }
 
-        if ($user->ida === User::find($leaveRequest->user_id)->report_to_id) {
+        if ($user->id === User::find($leaveRequest->user_id)->report_to_id) {
             return true;
         }
 
