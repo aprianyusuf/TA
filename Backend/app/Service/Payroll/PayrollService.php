@@ -5,7 +5,6 @@ use App\Utils\Enums\PayrollBonusTypeEnum;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PayrollService
 {
@@ -28,10 +27,10 @@ class PayrollService
                 $join->on('pp.id', '=', 'p.payroll_period_id')
                     ->join('organizations as o', 'o.id', '=', 'pp.organization_id');
             })
-            ->when(!is_null($payrollPeriodId), function ($query) use ($payrollPeriodId) {
+            ->when(! is_null($payrollPeriodId), function ($query) use ($payrollPeriodId) {
                 $query->where('p.payroll_period_id', $payrollPeriodId);
             })
-            ->when(!is_null($payrollId), function ($query) use ($payrollId) {
+            ->when(! is_null($payrollId), function ($query) use ($payrollId) {
                 $query->where('p.id', $payrollId);
             })
             ->when($request->get('employee_id'), function ($query) use ($request) {
@@ -69,21 +68,21 @@ class PayrollService
                     ->where('pb.payroll_id', $payroll->id);
 
                 $payroll->bonuses = (clone $bonusQuery)
-                    ->where('pbt.type', PayrollBonusTypeEnum::Bonus->value)
+                    ->where('pb.type', PayrollBonusTypeEnum::Bonus->value)
                     ->select(['pb.id', 'pb.value', 'pbt.name as type'])
                     ->get();
 
                 $payroll->bonus_value = (clone $bonusQuery)
-                    ->where('pbt.type', PayrollBonusTypeEnum::Bonus->value)
+                    ->where('pb.type', PayrollBonusTypeEnum::Bonus->value)
                     ->sum('pb.value');
 
                 $payroll->deductions = (clone $bonusQuery)
-                    ->where('pbt.type', PayrollBonusTypeEnum::Deduction->value)
+                    ->where('pb.type', PayrollBonusTypeEnum::Deduction->value)
                     ->select(['pb.id', 'pb.value', 'pbt.name as type'])
                     ->get();
 
                 $payroll->deduction_value = (clone $bonusQuery)
-                    ->where('pbt.type', PayrollBonusTypeEnum::Deduction->value)
+                    ->where('pb.type', PayrollBonusTypeEnum::Deduction->value)
                     ->sum('pb.value');
 
                 $payroll->net_pay = $payroll->salary + $payroll->bonus_value - $payroll->deduction_value;
@@ -122,88 +121,44 @@ class PayrollService
             ]);
     }
 
-    public function getPayrollPeriodQuery($organizationId)
+    public function update(Request $request, string $payrollId, string $payrollPeriodId)
     {
-        return DB::table('payroll_periods')
-            ->where('organization_id', $organizationId)
-            ->orderBy('start_at', 'desc');
-    }
+        DB::table('payrolls')
+            ->where('id', $payrollId)
+            ->update([
+                'status' => $request->get('status'),
+                'updated_at' => now(),
+            ]);
 
-    public function getCurrentPayrollPeriod($organizationId)
-    {
-        return $this->getPayrollPeriodQuery($organizationId)
-            ->where('start_at', '<=', now())
-            ->where('end_at', '>=', now())
-            ->first();
-    }
+        DB::table('payroll_bonuses')
+            ->where('payroll_id', $payrollId)
+            ->delete();
 
-    public function getPayrollPeriods($organizationId)
-    {
-        return $this->getPayrollPeriodQuery($organizationId)->get();
-    }
-
-    public function createNewPayrollPeriod($organizationId)
-    {
-        $currentDate  = now();
-        $startOfMonth = $currentDate->copy()->startOfMonth();
-        $endOfMonth   = $currentDate->copy()->endOfMonth();
-        $id           = Str::ulid();
-
-        if (DB::table('payroll_periods')->insert([
-            'id'              => $id,
-            'organization_id' => $organizationId,
-            'year'            => $currentDate->year,
-            'month'           => $currentDate->month,
-            'start_at'        => $startOfMonth,
-            'end_at'          => $endOfMonth,
-            'payroll_at'      => now()->addWeek(),
-        ])) {
-            return $id;
-        }
-        return null;
-    }
-
-    public function generatePayrolls($organizationId, Request $request)
-    {
-        $payrollPeriod = $this->getCurrentPayrollPeriod($organizationId);
-        if (! $payrollPeriod) {
-            $payrollPeriodId = $this->createNewPayrollPeriod($organizationId);
-            $payrollPeriod   = DB::table('payroll_periods')
-                ->where('id', $payrollPeriodId)
-                ->first();
+        foreach ($request->get('bonuses') as $bonus) {
+            DB::table('payroll_bonuses')->insert([
+                'value' => $bonus['value'],
+                'type' => PayrollBonusTypeEnum::Bonus->value,
+                'payroll_bonus_type_id' => $bonus['type_id'],
+                'payroll_id' => $payrollId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        // Fetch employees who do NOT have payrolls assigned in the current payroll period
-        $employees = DB::table('employees as e')
-            ->join('users as u', function (JoinClause $join) {
-                $join->on('u.id', '=', 'e.user_id')
-                    ->where('u.organization_id', '=', 'o.id');
-            })
-            ->leftJoin('payrolls as p', function ($join) use ($payrollPeriod) {
-                $join->on('p.employee_id', '=', 'e.id')
-                    ->where('p.payroll_period_id', '=', $payrollPeriod->id);
-            })
-            ->where('o.id', $organizationId)
-            ->whereNull('p.id') // Ensures only employees who DON'T have payrolls
-            ->select([
-                'e.id as employee_id',
-                'e.salary',
-            ])
-            ->get();
+        DB::table('payroll_bonuses')
+            ->where('payroll_id', $payrollId)
+            ->delete();
 
-        // Insert payrolls for employees who haven't received any for this period
-        foreach ($employees as $employee) {
-            $id = Str::ulid();
-            if (DB::table('payrolls')->insert([
-                'id'                => $id,
-                'employee_id'       => $employee->employee_id,
-                'payroll_period_id' => $payrollPeriod->id,
-                'salary'            => $employee->salary,
-            ])) {
-                $payroll = DB::table('payrolls')
-                    ->where('id', $id)
-                    ->first();
-            }
+        foreach ($request->get('deductions') as $deduction) {
+            DB::table('payroll_bonuses')->insert([
+                'value' => $deduction['value'],
+                'type' => PayrollBonusTypeEnum::Deduction->value,
+                'payroll_bonus_type_id' => $deduction['type_id'],
+                'payroll_id' => $payrollId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
+
 }

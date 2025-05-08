@@ -205,6 +205,7 @@ class DatabaseSeeder extends Seeder
                 LeaveTypeSeeder::class,
                 LeaveRequestSeeder::class,
                 PayrollPeriodSeeder::class,
+                PayrollBonusTypeSeeder::class,
                 PayrollSeeder::class,
             ]);
         }
