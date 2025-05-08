@@ -81,7 +81,7 @@ const DateTimesheetControl = () => {
 	});
 
 	return (
-		<div className="grid grid-cols-4 place-items-center gap-2 md:grid-cols-12">
+		<div className="grid grid-cols-4 gap-2 place-items-center md:grid-cols-12">
 			<CalendarControl
 				name="start_date_at"
 				onChangeListen={(val) => {
@@ -120,7 +120,7 @@ const DateTimesheetControl = () => {
 				}}
 				className="col-span-3"
 			/>
-			<span className="hidden text-center text-sm md:col-auto md:block md:w-32">
+			<span className="hidden text-sm text-center md:col-auto md:block md:w-32">
 				{startDateAt &&
 					endDateAt &&
 					startTimeAt &&
@@ -143,7 +143,7 @@ const DateTimesheetControl = () => {
 };
 
 const ModalRequest = ({
-	handleFormOpen = () => {},
+	handleFormOpen = () => { },
 	state: { state, type, event },
 }) => {
 	const [detailState, setDetailState] = useState({
@@ -187,35 +187,11 @@ const ModalRequest = ({
 
 	const handleSubmit = (data, e) => {
 		const payload = {
-			start_at: format(
-				add(
-					parse(
-						format(data.start_date_at, "yyyy-MM-dd") + " " + data.start_time_at,
-						"yyyy-MM-dd HH:mm",
-						new Date(),
-					),
-					// { hours: getUTCOffsetInHours(data.timezone) },
-				),
-				"yyyy-MM-dd",
-			),
-			end_at: format(
-				add(
-					parse(
-						format(data.end_date_at, "yyyy-MM-dd") + " " + data.end_time_at,
-						"yyyy-MM-dd HH:mm",
-						new Date(),
-					),
-					// { hours: getUTCOffsetInHours(data.timezone) },
-				),
-				"yyyy-MM-dd",
-			),
-			description: "test",
-			status: e.nativeEvent.submitter.value === "submit" ? 1 : 0,
+			startDate: format(data.start_date_at, "yyyy-MM-dd"),
+			endDate: format(data.end_date_at, "yyyy-MM-dd"),
+			description: data.description,
+			leaveType: data.leavetype_id,
 		};
-
-		if (detailState.type === 0 && type !== 0) {
-			payload.id = state.id;
-		}
 
 		onSubmitRequest(payload, e);
 	};
@@ -230,31 +206,31 @@ const ModalRequest = ({
 						type === 0 ? state?.endDateAt || new Date() : state.endDateAt,
 					description: type === 0 ? null : state.description,
 				}}
-				schema={TimesheetSchema}
+				// schema={TimesheetSchema}
 				onSubmit={handleSubmit}
 				className="flex-grow"
 			>
-				<div className="my-2 flex flex-col gap-2">
+				<div className="flex flex-col gap-2 my-2">
 					<LeaveTypeControl />
 				</div>
-				<div className="my-2 flex flex-col gap-2">
+				<div className="flex flex-col gap-2 my-2">
 					<span className="font-normal">Time</span>
 					<DateTimesheetControl />
 				</div>
-				<div className="my-2 flex flex-col gap-2">
+				<div className="flex flex-col gap-2 my-2">
 					<span className="font-normal">Description</span>
 					<InputControl
 						placeholder={"Description"}
 						name={"description"}
 						leftAddOn={
-							<span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
+							<span className="absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm pointer-events-none text-muted-foreground peer-disabled:opacity-50">
 								<Pencil className="size-4" />
 							</span>
 						}
-						className="peer pl-10"
+						className="pl-10 peer"
 					/>
 				</div>
-				<div className="mt-3 flex justify-end gap-2">
+				<div className="flex justify-end gap-2 mt-3">
 					<Button
 						type="submit"
 						disabled={isLoadingSubmitRequest}
