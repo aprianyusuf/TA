@@ -34,7 +34,7 @@ const DateControl = () => {
 
 	return (
 		<>
-			<div className="grid grid-cols-4 place-items-center gap-2 md:grid-cols-12">
+			<div className="grid grid-cols-4 gap-2 place-items-center md:grid-cols-12">
 				<CalendarControl
 					name="start_date_at"
 					onChangeListen={(val) => {
@@ -68,7 +68,7 @@ const DateControl = () => {
 					}}
 					className="col-span-3"
 				/>
-				<span className="ml-10 hidden text-center text-sm md:col-auto md:block md:w-32">
+				<span className="hidden ml-10 text-sm text-center md:col-auto md:block md:w-32">
 					{startDateAt &&
 						endDateAt &&
 						`${calculateWorkingDays(
@@ -85,7 +85,7 @@ const DateControl = () => {
 };
 
 const ModalRequest = ({
-	handleFormOpen = () => {},
+	handleFormOpen = () => { },
 	state: { state, type },
 }) => {
 	const queryClient = useQueryClient();
@@ -98,11 +98,12 @@ const ModalRequest = ({
 					data: res.data,
 				});
 				handleFormOpen({ isOpen: false });
+				toast.success(res.message)
 			},
 			onError: (err) => {
 				toast.error(err.message);
 			},
-			invalidateQueries: [["detailTimesheet", { id: state?.id }]],
+			invalidateQueries: [["detailTimesheet", { id: state?.id }], "leave-request"],
 		});
 
 	const handleSubmit = (data, e) => {
@@ -128,27 +129,27 @@ const ModalRequest = ({
 				onSubmit={handleSubmit}
 				className="flex-grow"
 			>
-				<div className="my-2 flex flex-col gap-2">
+				<div className="flex flex-col gap-2 my-2">
 					<LeaveTypeControl />
 				</div>
-				<div className="my-2 flex flex-col gap-2">
+				<div className="flex flex-col gap-2 my-2">
 					<span className="font-normal">Date</span>
 					<DateControl />
 				</div>
-				<div className="my-2 flex flex-col gap-2">
+				<div className="flex flex-col gap-2 my-2">
 					<span className="font-normal">Description</span>
 					<InputControl
 						placeholder={"Description"}
 						name={"description"}
 						leftAddOn={
-							<span className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm text-muted-foreground peer-disabled:opacity-50">
+							<span className="absolute inset-y-0 left-0 flex items-center justify-center pl-3 text-sm pointer-events-none text-muted-foreground peer-disabled:opacity-50">
 								<Pencil className="size-4" />
 							</span>
 						}
-						className="peer pl-10"
+						className="pl-10 peer"
 					/>
 				</div>
-				<div className="mt-3 flex justify-end gap-2">
+				<div className="flex justify-end gap-2 mt-3">
 					<Button
 						type="submit"
 						disabled={isLoadingSubmitRequest}
