@@ -1,12 +1,19 @@
 import {
+	addDays,
 	addMinutes,
+	differenceInCalendarDays,
 	differenceInMinutes,
+	format,
+	getDay,
+	isBefore,
+	isEqual,
+	isValid,
 	setMilliseconds,
 	setMinutes,
 	setSeconds,
 } from "date-fns";
 import { jwtDecode } from "jwt-decode";
-import { differenceInCalendarDays } from "date-fns";
+
 import FileApi from "@/apis/v1/FileApi";
 import { useBoundStore } from "@/stores";
 
@@ -141,6 +148,25 @@ export function calculateTimeDifferenceDays(startDate, endDate) {
 	return `${days}d`;
 }
 
+export function calculateWorkingDays(startDate, endDate) {
+	if (!isValid(startDate) || !isValid(endDate)) {
+		return "-";
+	}
+
+	let workingDays = 0;
+	let current = startDate;
+
+	while (isBefore(current, endDate) || isEqual(current, endDate)) {
+		const day = getDay(current); // 0 = Sunday, 6 = Saturday
+		if (day !== 0 && day !== 6) {
+			workingDays++;
+		}
+		current = addDays(current, 1);
+	}
+
+	return workingDays;
+}
+
 function invertHexColor(hex) {
 	hex = hex.replace("#", "");
 
@@ -243,3 +269,11 @@ export function hexToRgb(hex, alpha = 1) {
 
 	return `rgba(${parseInt(hex.slice(0, 2), 16)}, ${parseInt(hex.slice(2, 4), 16)}, ${parseInt(hex.slice(4, 6), 16)}, ${alpha})`;
 }
+
+export const safeFormat = (date, dateFormat = "dd/MM/yyyy") => {
+	try {
+		return format(date, dateFormat);
+	} catch {
+		return "";
+	}
+};

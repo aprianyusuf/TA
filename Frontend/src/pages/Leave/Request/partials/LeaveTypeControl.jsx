@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import PropTypes from "prop-types";
 
-import LeaveRequestApi from "@/apis/v1/LeaveApi/LeaveRequestApi";
 import LeaveTypeApi from "@/apis/v1/LeaveApi/LeaveTypeApi";
 import SelectControl from "@/components/moleculs/Control/SelectControl";
 import { useCustomQuery } from "@/hooks/useCustomQuery";
@@ -22,7 +21,7 @@ const LeaveTypeControl = ({ id = null }) => {
 		<>
 			<SelectControl
 				label="Leave Type"
-				name="leavetype_id"
+				name="leave_type_id"
 				options={dataLeaveType?.data
 					?.filter((i) => (id ? i.id !== +id : true))
 					?.map((v) => ({
