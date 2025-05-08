@@ -69,24 +69,26 @@ const DetailRequest = ({
 		);
 	}
 
-	const handleSubmitOnApprove = (data, e) => {
+	const handleSubmit = (data, e) => {
 		const payload = {
 			id: data?.id,
 		};
 
-		onApproveLeaveRequest(payload, e);
-	};
+		const submitValue = e.nativeEvent.submitter.value;
 
-	const handleSubmitOnReject = (data, e) => {
-		const payload = {
-			id: data?.id,
-		};
-
-		onRejectLeaveRequest(payload, e);
+		submitValue === "approve"
+			? onApproveLeaveRequest(payload, e)
+			: onRejectLeaveRequest(payload, e);
 	};
 
 	return (
-		<>
+		<HookFormProvider
+			defaultValues={{
+				id: leaveRequestData?.data?.id,
+			}}
+			onSubmit={handleSubmit}
+			className="flex-grow"
+		>
 			<div className="my-2 flex flex-col gap-2">
 				<span className="font-medium">Name</span>
 				<span className="border-black-400 bg-black-50 inline-block rounded border px-3 py-1 text-sm font-medium text-black">
@@ -122,51 +124,31 @@ const DetailRequest = ({
 					{leaveRequestData?.data?.description}
 				</span>
 			</div>
-			<div className="mt-3 flex justify-end gap-2">
-				<HookFormProvider
-					defaultValues={{
-						id: leaveRequestData?.data?.id,
-					}}
-					onSubmit={handleSubmitOnApprove}
-					className="flex-grow"
+			<div className="mt-3 flex gap-3">
+				<Button
+					disabled={isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest}
+					className="w-36 bg-green-600 text-white hover:bg-green-600 hover:text-black"
+					value="accept"
 				>
-					<Button
-						disabled={
-							isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest
-						}
-						className="w-36 bg-green-600 text-white hover:bg-green-600 hover:text-black"
-						value="accept"
-					>
-						{isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest ? (
-							<Spinner />
-						) : (
-							"Accept"
-						)}
-					</Button>
-				</HookFormProvider>
-				<HookFormProvider
-					defaultValues={{
-						id: leaveRequestData?.data?.id,
-					}}
-					onSubmit={handleSubmitOnReject}
-					className="flex-grow"
+					{isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest ? (
+						<Spinner />
+					) : (
+						"Accept"
+					)}
+				</Button>
+				<Button
+					disabled={isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest}
+					className="w-36 bg-red-600 text-white hover:bg-red-600 hover:text-black"
+					value="reject"
 				>
-					<Button
-						disabled={
-							isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest
-						}
-						className="w-36 bg-red-600 text-white hover:bg-red-600 hover:text-black"
-						value="reject"
-					>
-						{isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest ? (
-							<Spinner />
-						) : (
-							"Reject"
-						)}
-					</Button>
-				</HookFormProvider>
+					{isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest ? (
+						<Spinner />
+					) : (
+						"Reject"
+					)}
+				</Button>
 			</div>
-		</>
+		</HookFormProvider>
 	);
 };
 
