@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\API\V1\Payroll;
 
 use Illuminate\Http\Request;
@@ -21,10 +22,10 @@ class PayrollApiController extends Controller
      *
      * @body array{status: string, code: int, data: array[], count: int}
      */
-    public function index(Request $request, $payrollPeriodId=null)
+    public function index(Request $request, $payrollPeriodId = null)
     {
-        if(!is_null($payrollPeriodId)) {
-            if(DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
+        if (!is_null($payrollPeriodId)) {
+            if (DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
                 return $this->errorResponse('Payroll Period not found', 404);
             }
         }
@@ -37,46 +38,41 @@ class PayrollApiController extends Controller
      * Show payroll
      */
 
-    public function show(Request $request, $payrollId, $payrollPeriodId=null )
+    public function show(Request $request, $payrollId, $payrollPeriodId = null)
     {
-        if(DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
+        if (DB::table('payroll_periods')->where('id', $payrollId)->count() == 0) {
             return $this->errorResponse('Payroll Period not found', 404);
         }
-        if(DB::table('payrolls')->where('id', $payrollId)->count() == 0) {
+        if (DB::table('payrolls')->where('id', $payrollPeriodId)->count() == 0) {
             return $this->errorResponse('Payroll not found', 404);
         }
-        [$data, $count] = $this->payrollService->getData($request, $payrollPeriodId, $payrollId);
+        [$data, $count] = $this->payrollService->getData($request, $payrollId, $payrollPeriodId);
         return $this->successResponse(data: $data, optionalResponses: ['count' => $count]);
     }
 
     public function create(Request $request, $payrollPeriodId)
     {
-        if(DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
+        if (DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
             return $this->errorResponse('Payroll Period not found', 404);
         }
         $this->payrollService->create($request, $payrollPeriodId);
         return $this->successResponse();
     }
 
-    public function update(Request $request, $payrollId, $payrollPeriodId)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'bonuses'=>'array',
-            'bonuses.*.type_id'=>'required|string',
-            'bonuses.*.percentage'=>'required|string',
-            'bonuses.*.value'=>'required|numeric',
-            'deductions'=>'array',
-            'deductions.*.type_id'=>'required|string',
-            'deductions.*.percentage'=>'required|string',
-            'deductions.*.value'=>'required|numeric',
+            'bonuses' => 'array',
+            'bonuses.*.id' => 'required|string',
+            'bonuses.*.value' => 'required|numeric',
+            'deductions' => 'array',
+            'deductions.*.id' => 'required|string',
+            'deductions.*.value' => 'required|numeric',
         ]);
-        if(DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
-            return $this->errorResponse('Payroll Period not found', 404);
-        }
-        if(DB::table('payrolls')->where('id', $payrollId)->count() == 0) {
+        if (DB::table('payrolls')->where('id', $id)->count() == 0) {
             return $this->errorResponse('Payroll not found', 404);
         }
-        $this->payrollService->update($request, $payrollId, $payrollPeriodId);
+        $this->payrollService->update($request, $id);
         return $this->successResponse();
     }
 }

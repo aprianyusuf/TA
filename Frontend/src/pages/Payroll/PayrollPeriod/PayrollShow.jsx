@@ -16,78 +16,98 @@ import { AddPositionSchema } from "@/schema/request/Foundation/PositionRequestSc
 import CheckAuthorization from "@/templates/CheckAuthorization";
 import NotFound from "@/templates/NotFound";
 import PayrollApi from "@/apis/v1/PayrollApi/PayrollApi";
+import { useFieldArray, useFormContext } from "react-hook-form";
+
+const FormBonus = () => {
+	const { control } = useFormContext();
+
+	const { fields } = useFieldArray({
+		control,
+		name: "bonuses",
+	});
+
+	return (
+		<div className="flex flex-col gap-3">
+			<p className="font-bold">Bonus</p>
+			{fields.map((v, i) =>
+				<div key={v.id} className="flex gap-2">
+					<InputControl label={'Type'} name={`bonuses.${i}.name`} isDisabled />
+					<InputControl label={'Value'} name={`bonuses.${i}.value`} />
+				</div>
+			)}
+		</div>
+	)
+}
+
+const FormDeduction = () => {
+	const { control } = useFormContext();
+
+	const { fields } = useFieldArray({
+		control,
+		name: "deductions",
+	});
+
+	return (
+		<div className="flex flex-col gap-3">
+			<p className="font-bold">Deduction</p>
+			{fields.map((v, i) =>
+				<div key={v.id} className="flex gap-2">
+					<InputControl label={'Type'} name={`deductions.${i}.name`} isDisabled />
+					<InputControl label={'Value'} name={`deductions.${i}.value`} />
+				</div>
+			)}
+		</div>
+	)
+}
 
 const EditPayroll = () => {
 	const { payrollperiodid, payrollid } = useParams();
 	const navigate = useNavigate();
-	// const [schema, setSchema] = useState(() => AddPositionSchema({}));
 
 	const {
 		data: detailPayroll,
 		isLoading: isLoadingDetailPayroll,
 		error: errorDetailPayroll,
 	} = useCustomQuery({
-		api: PayrollApi.show,
-		queryKey: ["payroll-show", { payrollperiodid, payrollid }],
-		queryParams: { payrollperiodid, payrollid },
+		api: PayrollApi.showDetailPeriod,
+		queryKey: ["showDetailPeriod", { id: payrollperiodid, periodId: payrollid }],
+		queryParams: { id: payrollperiodid, periodId: payrollid },
 	});
-
-	// const {
-	// 	data: organizationPermission,
-	// 	isLoading: isLoadingOrganizationPermission,
-	// } = useCustomQuery({
-	// 	api: OrganizationApi.getPermission,
-	// 	queryKey: "organizationPermission",
-	// });
-
-	// useEffect(() => {
-	// 	if (!isLoadingOrganizationPermission) {
-	// 		setSchema(
-	// 			AddPositionSchema(
-	// 				organizationPermission.data.reduce((acc, item) => {
-	// 					acc[item.code] = {
-	// 						value: false,
-	// 						name: item.name,
-	// 						group: item.moduleName,
-	// 					};
-	// 					return acc;
-	// 				}, {}),
-	// 			),
-	// 		);
-	// 	}
-	// }, [isLoadingOrganizationPermission]);
 
 	const { onSubmit: onSubmitEditPayroll, isLoading: isLoadingEditPayroll } =
 		useCustomMutation({
 			api: PayrollApi.update,
-			invalidateQueries: ["payroll", ["payroll", { payrollid }]],
+			invalidateQueries: ["payroll", ["payroll", { payrollid }], ["showDetailPeriod", { id: payrollperiodid, periodId: payrollid }]],
 			onError: (res) => {
 				toast.error(res.message);
 			},
 			onSuccess: (res) => {
 				toast.success(res.message);
-				navigate("/master/position");
+				navigate(`/payroll/payrollperiod/${payrollperiodid}`);
 			},
 		});
 
-	const handleSubmit = async (data, e) => {
+	const handleSubmit = async (data) => {
 		const payload = {
+			bonuses: data.bonuses.map((v) => ({ ...v, value: +v.value })),
+			deductions: data.deductions.map((v) => ({ ...v, value: +v.value })),
+			status: ""
 		};
 
-		onSubmitEditPayroll(payload, e);
+		onSubmitEditPayroll({ id: payrollid, ...payload });
 	};
 
 	if (isLoadingDetailPayroll) {
 		return (
-			<div className="flex h-full w-full items-center justify-center">
+			<div className="flex items-center justify-center w-full h-full">
 				<Spinner />
 			</div>
 		);
 	}
 
-	// if (errorDetailPosition) {
-	// 	return <NotFound message="Position not found" />;
-	// }
+	if (errorDetailPayroll || !detailPayroll.data.length) {
+		return <NotFound message="Payroll not found" />;
+	}
 
 	return (
 		<>
@@ -99,26 +119,22 @@ const EditPayroll = () => {
 					<HookFormProvider
 						onSubmit={handleSubmit}
 						defaultValues={{
-							employee_id:null,
-							payroll_period_id:payrollperiodid,
-							salary:5000000,
-							bonus:0,
-							deduction:0,
-							net_pay:0,
-							status:'okay',
+							employee_id: detailPayroll.data[0].employeeId,
+							payroll_period_id: payrollperiodid,
+							salary: detailPayroll.data[0].salary,
+							bonuses: detailPayroll.data[0].bonuses,
+							// bonuses: [{ type: "JHT", value: "3.7" }],
+							// deductions: [{ type: "JHT", value: "3.7" }],
+							deductions: detailPayroll.data[0].deductions,
+							name: `${detailPayroll.data[0].firstName} ${detailPayroll.data[0].lastName}`
 						}
 						}
-						// schema={schema}
 						className="flex flex-col gap-3"
 					>
-						<InputControl label={'Name'} name={'employee_id'} />
-						{/* <InputControl label={'Payroll Period'} name={'payroll_period_id'}/> */}
-						<InputControl label={'Salary'} name={'salary'}/>
-						<InputControl label={'Bonus'} name={'bonus'}/>
-						<InputControl label={'Deduction'} name={'deduction' }/>
-						<InputControl label={'THP' } name={'net_pay' }/>
-						<InputControl label={'Status' } name={'status' }/>
-						
+						<InputControl label={'Name'} name={'name'} isDisabled />
+						<InputControl label={'Salary'} name={'salary'} isDisabled />
+						<FormBonus />
+						<FormDeduction />
 
 						<div className="flex justify-end">
 							<Button disabled={isLoadingEditPayroll} className="w-40">
