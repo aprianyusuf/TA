@@ -23,6 +23,19 @@ class PayrollApiController extends Controller
      */
     public function index(Request $request, $payrollPeriodId = null)
     {
+        $request->validate(
+            [
+                /**
+                 * @default 10
+                 */
+                'size' => ['int'],
+                /**
+                 * @default 1
+                 */
+                'page' => ['int'],
+            ]
+        );
+
         if (! is_null($payrollPeriodId)) {
             if (DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
                 return $this->errorResponse('Payroll Period not found', 404);
@@ -49,14 +62,14 @@ class PayrollApiController extends Controller
         return $this->successResponse(data: $data, optionalResponses: ['count' => $count]);
     }
 
-    public function create(Request $request, $payrollPeriodId)
-    {
-        if (DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
-            return $this->errorResponse('Payroll Period not found', 404);
-        }
-        $this->payrollService->create($request, $payrollPeriodId);
-        return $this->successResponse();
-    }
+    // public function create(Request $request, $payrollPeriodId)
+    // {
+    //     if (DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
+    //         return $this->errorResponse('Payroll Period not found', 404);
+    //     }
+    //     $this->payrollService->create($request, $payrollPeriodId);
+    //     return $this->successResponse();
+    // }
 
     public function update(Request $request, $id)
     {

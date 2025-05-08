@@ -152,7 +152,7 @@ class LeaveRequestApiController extends Controller
         return $this->successResponse(data: $rejected, message: 'Success reject leave request');
     }
 
-    public function abort(Request $request, string $leaveRequestId, LeaveRequestService $leaveRequestService)
+    public function cancel(Request $request, string $leaveRequestId, LeaveRequestService $leaveRequestService)
     {
         $leaveRequest = LeaveRequest::where('id', $leaveRequestId)
             ->where('organization_id', $request->decoded->get('organization')?->get('id'))
@@ -171,7 +171,7 @@ class LeaveRequestApiController extends Controller
 
         $actor = User::find($request->decoded->get('id'));
 
-        $hasPermission = $leaveRequestService->hasPermissionToActOnLeaveRequest($leaveRequest, $actor, 'abort');
+        $hasPermission = $leaveRequestService->hasPermissionToActOnLeaveRequest($leaveRequest, $actor, 'cancel');
 
         if (! $hasPermission) {
             /**

@@ -8,4 +8,6 @@ export default {
 		PUT({ path: `/leave-request/${id}/approve`, payload }),
 	rejectLeaveRequest: ({ id, ...payload }) =>
 		PUT({ path: `/leave-request/${id}/reject`, payload }),
+	cancelLeaveRequest: ({ id, ...payload }) =>
+		PUT({ path: `/leave-request/${id}/cancel`, payload }),
 };

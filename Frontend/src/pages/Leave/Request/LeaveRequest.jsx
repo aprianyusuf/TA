@@ -133,39 +133,40 @@ const LeaveRequest = () => {
 					);
 				},
 			}),
-			columnHelper.accessor("action", {
-				header: <TableHeader className={"text-center"}>Action</TableHeader>,
-				cell: ({ row: { original } }) => (
-					<TableCell className="flex justify-center gap-2">
-						{["Human Resource", "Direktur", "General Manager"].includes(userPosition) ? (
-							<Button
-								className="p-2"
-								onClick={() =>
-									setDetailState((prev) => ({
-										...prev,
-										isOpen: true,
-										type: 0,
-										state: {},
-										data: original,
-									}))
-								}
-							>
-								<Info size={16} />
-							</Button>
-						) : (
-							<Button className="bg-red-500 p-2" title="Abort">
-								<X size={16} />
-							</Button>
-						)}
-					</TableCell>
-				),
-			}),
+            columnHelper.accessor("action", {
+                header: <TableHeader className={"text-center"}>Action</TableHeader>,
+                cell: ({ row: { original } }) => {
+                    const status = original.status;
+                    const isDisabled = status === 1 || status === 3;
+            
+                    return (
+                        <TableCell className="flex justify-center gap-2">
+                            {["Human Resource", "Direktur", "General Manager"].includes(userPosition) ?(
+                                <Button
+                                    className="p-2"
+                                    disabled={isDisabled}
+                                    onClick={() =>
+                                        setDetailState((prev) => ({
+                                            ...prev,
+                                            isOpen: true,
+                                            type: 0,
+                                            state: {},
+                                            data: original,
+                                        }))
+                                    }
+                                >
+                                    <Info size={16} />
+                                </Button>
+                            ) : ('')}
+                        </TableCell>
+                    );
+                },
+            }),
 		],
 		[],
 	);
 
 	const calendarRef = useRef();
-	const [isCalendarViewOpen, setCalendarViewOpen] = useState(false);
 	const [selectedDateRangeText, setSelectedDateRangeText] = useState("");
 	const selectedAs = useBoundLocalStore((state) => state.selectedAs);
 	const [view, setView] = useState(

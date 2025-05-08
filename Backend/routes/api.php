@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/create', 'store')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::ADD_LEAVE_REQUEST->value)[0]);
             Route::put('/{id}/approve', 'approve')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
             Route::put('/{id}/reject', 'reject')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
+            Route::put('/{id}/cancel', 'cancel')->middleware(EnsureUserHasPermission::class . ':' . explode("|", PermissionConstant::EDIT_LEAVE_REQUEST->value)[0]);
         });
 
     Route::prefix('leave-type')
