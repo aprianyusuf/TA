@@ -102,6 +102,7 @@ const EditEmployee = () => {
 							hired_start_at: detailEmployee.data.hiredStartAt,
 							hired_end_at: detailEmployee.data.hiredEndAt,
 							employment_type: detailEmployee.data.employmentType,
+							salary: detailEmployee.data.salary,
 						}}
 						schema={AddEmployeeSchema}
 						className="flex flex-col gap-3"
@@ -153,6 +154,10 @@ const EditEmployee = () => {
 						<div className="flex gap-2">
 							<EmploymentTypeControl />
 							<HiredDateControl />
+						</div>
+
+						<div className="flex flex-col gap-2 md:flex-row">
+							<InputControl label="Base Salary" name="salary" type="number" className="w-full md:w-1/2"/>
 						</div>
 
 						<div className="flex justify-end">

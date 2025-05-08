@@ -81,8 +81,9 @@ const AddEmployee = () => {
 							hired_start_at: null,
 							hired_end_at: null,
 							employment_type: null,
+							salary: null,
 						}}
-						schema={AddEmployeeSchema}
+					schema={AddEmployeeSchema}
 						className="flex flex-col gap-3"
 					>
 						<div className="flex flex-col gap-2 md:flex-row">
@@ -132,6 +133,10 @@ const AddEmployee = () => {
 						<div className="flex flex-col gap-2 md:flex-row">
 							<EmploymentTypeControl />
 							<HiredDateControl />
+						</div>
+
+						<div className="flex flex-col gap-2 md:flex-row">
+							<InputControl label="Base Salary" name="salary" type="number" className="w-full md:w-1/2"/>
 						</div>
 
 						<div className="flex justify-end">

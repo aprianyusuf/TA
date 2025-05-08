@@ -30,7 +30,7 @@ const CheckboxControl = ({
 				<FormItem className="flex flex-row items-start space-x-2 space-y-0 rounded-md p-2">
 					<FormControl>
 						<Checkbox
-							checked={field.value}
+							checked={!!field.value}
 							onCheckedChange={
 								inputChange
 									? (e) => inputChange(e, field.onChange)

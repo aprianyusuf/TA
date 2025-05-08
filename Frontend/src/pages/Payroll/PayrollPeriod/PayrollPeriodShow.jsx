@@ -4,8 +4,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 // import {} from 'basicprimitives';
 import { ChildrenPlacementType, Enabled, PageFitMode } from "basicprimitives";
 import { OrgDiagram } from "basicprimitivesreact";
-import { Edit, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Edit, Plus, Printer } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 
 import EmployeeApi from "@/apis/v1/MasterApi/EmployeeApi";
 import PayrollApi from "@/apis/v1/PayrollApi/PayrollApi";
@@ -21,13 +21,17 @@ import { useDataTable } from "@/hooks/useDataTable";
 import { getPaginationPage, isUserCan } from "@/services/helper";
 import CheckAuthorization from "@/templates/CheckAuthorization";
 import OrganizationDiagram from "@/pages/Master/Employee/partials/OrganizationDiagram";
+import { useCustomQuery } from "@/hooks/useCustomQuery";
 
 const columnHelper = createColumnHelper();
 
-const Employee = () => {
+const PayrollPeriodShow = () => {
+	const { id } = useParams();
+	
 	const { data, isLoading, pagination, setPagination } = useDataTable({
-		api: PayrollApi.getAll,
-		queryKey: "employees",
+		api: PayrollApi.getPayrollsByPeriod,
+		queryKey: ["payrollByPeriod", { id }],
+		queryParams: { id },
 	});
 
 	const columns = useMemo(
@@ -49,18 +53,44 @@ const Employee = () => {
 					width: "w-44",
 					cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
 				}),
-				columnHelper.accessor("position", {
-					header: <TableHeader>Position</TableHeader>,
+				columnHelper.accessor("salary", {
+					header: <TableHeader>Base Salary</TableHeader>,
 					width: "w-44",
 					cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
 				}),
-				columnHelper.accessor("createdBy", {
-					header: <TableHeader>Salary</TableHeader>,
+				columnHelper.accessor("status", {
+					header: <TableHeader>Status</TableHeader>,
 					width: "w-44",
-					cell: ({ getValue }) => <TableCell>{getValue()}</TableCell>,
+					cell: ({ getValue }) => {
+						const status = getValue();
+					
+						let text = "";
+						let bgColor = "";
+					
+						switch (status) {
+						case 0:
+							text = "Waiting";
+							bgColor = "bg-gray-400";
+							break;
+						case 1:
+							text = "Already Paid";
+							bgColor = "bg-green-500";
+							break;
+						default:
+							text = "Unknown";
+							bgColor = "bg-gray-200";
+						}
+						return (
+						<TableCell>
+							<span className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${bgColor}`}>
+							{text}
+							</span>
+						</TableCell>
+						);
+                    },
 				}),
 				columnHelper.accessor("action", {
-					isVisible: isCanEdit || isCanDelete,
+					isVisible: isCanEdit,
 					header: <TableHeader className={"text-center"}>Action</TableHeader>,
 					cell: ({ row: { original } }) => (
 						<TableCell className="flex justify-center gap-2">
@@ -71,16 +101,9 @@ const Employee = () => {
 									</Link>
 								</Button>
 							) : null}
-							{isCanDelete ? (
-								<DeleteRow
-									api={EmployeeApi.delete}
-									invalidateQueries={[
-										"employees",
-										["employee", { id: original.id }],
-									]}
-									payload={{ id: original.id }}
-								/>
-							) : null}
+								<Button className="bg-gray-500 p-2" title="print">
+                                    <Printer size={16}/>
+                                </Button>
 						</TableCell>
 					),
 				}),
@@ -92,7 +115,8 @@ const Employee = () => {
 		<>
 			<Tabs defaultValue="table" className="flex h-full w-full flex-col">
 				<TabsContent value="table">
-					<div className="mb-4 flex justify-end">
+					<div className="mb-4 flex items-center justify-start">
+						<h2 className="text-xl font-bold ml-5">Payroll Management</h2>
 					</div>
 					<Table
 						columns={columns({
@@ -113,6 +137,6 @@ const Employee = () => {
 };
 
 export default CheckAuthorization({
-	Component: Employee,
-	menu: "MD00001",
+	Component: PayrollPeriodShow,
+	menu: "MD00023",
 });
