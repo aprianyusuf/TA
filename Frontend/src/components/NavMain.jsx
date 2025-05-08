@@ -26,8 +26,6 @@ import {
 	ROUTE_LEAVE,
 	ROUTE_MASTER,
 	ROUTE_PAYROLL,
-	ROUTE_PROJECT_MANAGEMENT,
-	ROUTE_TIMESHEET,
 } from "@/routes";
 import { useBoundStore } from "@/stores";
 

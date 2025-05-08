@@ -99,6 +99,7 @@ const SubmitClockInOut = ({ handleChangeComponent, clockType }) => {
 		);
 		onUploadS3({ url, file });
 		data.image = imageKey;
+		console.log(data)
 		data.latitude = data.latitude.toString().slice(0, -1);
 		data.longitude = data.longitude.toString().slice(0, -1);
 		onSubmitPostTodayClockIn(data, e);

@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { Route, Routes, useNavigate } from "react-router";
 
 import { Spinner } from "@/components/atoms/Spinner";
-import { ROUTE_TIMESHEET } from "@/routes";
+// import { ROUTE_TIMESHEET } from "@/routes";
 import { useBoundStore } from "@/stores";
 
 const Timesheet = () => {
@@ -28,7 +28,7 @@ const Timesheet = () => {
 
 	return (
 		<>
-			<Routes key={token}>
+			{/* <Routes key={token}>
 				{ROUTE_TIMESHEET.filter(
 					(v) => v.menu === true || permission.includes(v.menu)
 				).map(({ path, Component, isLazy }, key) => (
@@ -53,7 +53,7 @@ const Timesheet = () => {
 						}
 					/>
 				))}
-			</Routes>
+			</Routes> */}
 		</>
 	);
 };

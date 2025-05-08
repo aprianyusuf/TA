@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
-    "@ikhbaaalll/custom-toast-ui-react-calendar": "0.0.1-alpha.17",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",

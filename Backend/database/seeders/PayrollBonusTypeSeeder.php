@@ -83,7 +83,7 @@ class PayrollBonusTypeSeeder extends Seeder
                 'organization_id' => $organizationId,
                 'name' => 'Tax',
                 'description' => 'Tax',
-                'percentage' => 8,
+                'percentage' => 4,
                 'value_fixed' => false,
                 'value' => null,
                 'is_paid_by_organization' => false,

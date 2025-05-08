@@ -16,7 +16,7 @@ const SidebarSwitcher = () => {
 			) : (
 				<>
 					<NavMain />
-					<NavProjects />
+					{/* <NavProjects /> */}
 				</>
 			)}
 		</>

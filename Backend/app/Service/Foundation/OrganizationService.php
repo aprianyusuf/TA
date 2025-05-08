@@ -48,7 +48,7 @@ class OrganizationService
         $count = $query->count('id');
 
         if ($request->get('orderColumn')) {
-            $query = $query->orderBy(DB::raw($request->get('orderColumn')), $$request->get('orderBy') ?? "asc");
+            $query = $query->orderBy(DB::raw($request->get('orderColumn')), $request->get('orderBy') ?? "asc");
         }
 
         $query = $query->skip(($request->get('page', 1) - 1) * $request->get('size', 10))->limit($request->get('size', 10));

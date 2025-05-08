@@ -36,7 +36,7 @@ const PayrollPeriodShow = () => {
 
 	const columns = useMemo(
 		() =>
-			({ isCanEdit = false, isCanDelete = false }) => [
+			({ isCanEdit = false}) => [
 				columnHelper.accessor("no", {
 					header: <TableHeader className={"text-center"}>No</TableHeader>,
 					width: "w-4",
@@ -61,8 +61,11 @@ const PayrollPeriodShow = () => {
 				columnHelper.accessor("status", {
 					header: <TableHeader>Status</TableHeader>,
 					width: "w-44",
-					cell: ({ getValue }) => {
-						const status = getValue();
+					cell: ({ row }) => {
+						const payrollAt = new Date(row.original.payrollAt);
+						const today = new Date();
+					
+						const status = today > payrollAt ? 1 : 0;
 
 						let text = "";
 						let bgColor = "";

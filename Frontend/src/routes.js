@@ -219,16 +219,16 @@ export const ROUTE_PROJECT = [
 	},
 ];
 
-export const ROUTE_TIMESHEET = [
-	{
-		Component: lazy(
-			() => import("@/pages/Timesheet/MonthlyTimesheet/MonthlyTimesheet"),
-		),
-		path: "/",
-		menu: true,
-		isLazy: true,
-		title: "Timesheet",
-		fullPath: "/timesheet",
-		isNavbar: true,
-	},
-];
+// export const ROUTE_TIMESHEET = [
+// 	{
+// 		Component: lazy(
+// 			() => import("@/pages/Timesheet/MonthlyTimesheet/MonthlyTimesheet"),
+// 		),
+// 		path: "/",
+// 		menu: true,
+// 		isLazy: true,
+// 		title: "Timesheet",
+// 		fullPath: "/timesheet",
+// 		isNavbar: true,
+// 	},
+// ];

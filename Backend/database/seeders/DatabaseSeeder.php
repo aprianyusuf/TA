@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
             $position = [
                 ['id' => Str::ulid(), 'name' => 'Direktur', 'organization_id' => $rdtOrganization->id, 'position_id' => null],
                 ['id' => Str::ulid(), 'name' => 'General Manager', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Direktur'],
-                ['id' => Str::ulid(), 'name' => 'HR', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Direktur'],
+                ['id' => Str::ulid(), 'name' => 'Human Resource', 'organization_id' => $rdtOrganization->id, 'position_id' => 'Direktur'],
                 ['id' => Str::ulid(), 'name' => 'Manager Area', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
                 ['id' => Str::ulid(), 'name' => 'Manager Umum', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
                 ['id' => Str::ulid(), 'name' => 'Manager Marketing', 'organization_id' => $rdtOrganization->id, 'position_id' => 'General Manager'],
@@ -86,7 +86,7 @@ class DatabaseSeeder extends Seeder
                     'report_to_id' => null,
                     'subordinates' => [
                         ['first_name' => 'Kris', 'last_name' => 'Susanto', 'position_id' => 'General Manager'],
-                        ['first_name' => 'Aldo', 'last_name' => 'Moro', 'position_id' => 'HR']
+                        ['first_name' => 'Aldo', 'last_name' => 'Moro', 'position_id' => 'Human Resource']
                     ]
                 ],
                 [

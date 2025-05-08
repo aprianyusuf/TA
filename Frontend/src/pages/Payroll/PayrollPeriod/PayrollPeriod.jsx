@@ -4,7 +4,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 // import {} from 'basicprimitives';
 import { ChildrenPlacementType, Enabled, PageFitMode } from "basicprimitives";
 import { OrgDiagram } from "basicprimitivesreact";
-import { Edit, Plus } from "lucide-react";
+import { Edit, Info, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import EmployeeApi from "@/apis/v1/MasterApi/EmployeeApi";
@@ -104,9 +104,9 @@ const PayrollPeriod = () => {
                     cell: ({ row: { original } }) => (
                         <TableCell className="flex justify-center gap-2">
                             {isCanEdit ? (
-                                <Button asChild className="bg-yellow-400 p-2" variant="link">
+                                <Button asChild className="bg-gray-400 p-2" variant="link">
                                     <Link to={`${original.id}`}>
-                                        <Edit className="size-4 text-white" />
+                                        <Info className="size-4 text-white" />
                                     </Link>
                                 </Button>
                             ) : null}

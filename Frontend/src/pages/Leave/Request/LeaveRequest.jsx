@@ -137,7 +137,7 @@ const LeaveRequest = () => {
 				header: <TableHeader className={"text-center"}>Action</TableHeader>,
 				cell: ({ row: { original } }) => (
 					<TableCell className="flex justify-center gap-2">
-						{["HR", "Direktur"].includes(userPosition) ? (
+						{["Human Resource", "Direktur", "General Manager"].includes(userPosition) ? (
 							<Button
 								className="p-2"
 								onClick={() =>

@@ -124,7 +124,7 @@ const DetailRequest = ({
 					{leaveRequestData?.data?.description}
 				</span>
 			</div>
-			<div className="mt-3 flex gap-3">
+			<div className="mt-3 flex gap-3 flex justify-end">
 				<Button
 					disabled={isLoadingApproveLeaveRequest || isLoadingRejectLeaveRequest}
 					className="w-36 bg-green-600 text-white hover:bg-green-600 hover:text-black"

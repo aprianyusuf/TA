@@ -29,7 +29,7 @@ class LeaveRequestService
         $query = LeaveRequest::query()
             ->where('organization_id', $user['organization']['id']);
 
-        if (! in_array($user['position']['name'], ['HR', 'Direktur'])) {
+        if (! in_array($user['position']['name'], ['Human Resource', 'Direktur', 'General Manager'])) {
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user['id'])
                 // ->orWhereHas('user', function ($subQuery) use ($user) {
@@ -343,7 +343,7 @@ class LeaveRequestService
     public function hasPermissionToActOnLeaveRequest(LeaveRequest $leaveRequest, User $user, $action)
     {
         if($action === 'approve' || $action === 'reject') {
-            $validPositions   = ['HR', 'Direktur'];
+            $validPositions   = ['Human Resource', 'Direktur', 'General Manager'];
             $approverPosition = $user ? $user->position : null;
             if (in_array($approverPosition->name, $validPositions)) {
                 return true;
