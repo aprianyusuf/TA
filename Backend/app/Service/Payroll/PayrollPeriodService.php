@@ -74,7 +74,7 @@ class PayrollPeriodService
             'end_at'          => $request->endAt,
             'payroll_at'      => $request->payrollAt,
         ])) {
-            if (! is_null($request->is_generate_payroll) && $request->is_generate_payroll) {
+            if (! is_null($request->is_generate_payrolls) && $request->is_generate_payrolls) {
                 $this->generatePayrolls($auth['organization']['id'], $id);
             }
         }
