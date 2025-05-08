@@ -88,7 +88,7 @@ class PayrollService
                     ->where('pb.type', PayrollBonusTypeEnum::Deduction->value)
                     ->sum('pb.percentage');
 
-                $payroll->net_pay = $payroll->salary + $payroll->bonus_value - $payroll->deduction_value;
+                $payroll->net_pay = $payroll->salary + ($payroll->bonus_value * $payroll->salary / 100) - ($payroll->deduction_value * $payroll->salary/100);
 
                 return $payroll;
             });
