@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Http\Controllers\API\V1\Payroll;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Payroll\PayrollIndexResource;
+use App\Service\Payroll\PayrollService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Service\Payroll\PayrollService;
-use App\Http\Resources\Payroll\PayrollIndexResource;
 
 class PayrollApiController extends Controller
 {
@@ -24,7 +23,7 @@ class PayrollApiController extends Controller
      */
     public function index(Request $request, $payrollPeriodId = null)
     {
-        if (!is_null($payrollPeriodId)) {
+        if (! is_null($payrollPeriodId)) {
             if (DB::table('payroll_periods')->where('id', $payrollPeriodId)->count() == 0) {
                 return $this->errorResponse('Payroll Period not found', 404);
             }
@@ -62,11 +61,11 @@ class PayrollApiController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'bonuses' => 'array',
-            'bonuses.*.id' => 'required|string',
-            'bonuses.*.value' => 'required|numeric',
-            'deductions' => 'array',
-            'deductions.*.id' => 'required|string',
+            'bonuses'            => 'array',
+            'bonuses.*.id'       => 'required|string',
+            'bonuses.*.value'    => 'required|numeric',
+            'deductions'         => 'array',
+            'deductions.*.id'    => 'required|string',
             'deductions.*.value' => 'required|numeric',
         ]);
         if (DB::table('payrolls')->where('id', $id)->count() == 0) {
@@ -74,5 +73,20 @@ class PayrollApiController extends Controller
         }
         $this->payrollService->update($request, $id);
         return $this->successResponse();
+    }
+
+    public function delete($id)
+    {
+        if (DB::table('payrolls')->where('id', $id)->count() == 0) {
+            return $this->errorResponse('Payroll not found', 404);
+        }
+        if (DB::table('payrolls')->where('id', $id)->delete()) {
+            return $this->successResponse();
+        }
+        /**
+         * @status 500
+         * @body ErrorResource
+         */
+        return $this->errorResponse('Payroll not deleted', 500);
     }
 }
