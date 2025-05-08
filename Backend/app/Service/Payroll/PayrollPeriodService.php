@@ -1,13 +1,13 @@
 <?php
 namespace App\Service\Payroll;
 
-use Illuminate\Support\Str;
+use App\Utils\Enums\PayrollBonusTypeEnum;
+use App\Utils\Enums\PayrollStatusEnum;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Utils\Enums\PayrollStatusEnum;
-use App\Utils\Enums\PayrollBonusTypeEnum;
-use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
 
 class PayrollPeriodService
 {
@@ -73,7 +73,7 @@ class PayrollPeriodService
             'start_at'        => $request->startAt,
             'end_at'          => $request->endAt,
             'payroll_at'      => $request->payrollAt,
-        ])){
+        ])) {
             if (! is_null($request->is_generate_payroll) && $request->is_generate_payroll) {
                 $this->payrollService->generatePayrolls($auth['organization']['id'], $request, $id);
             }
@@ -190,7 +190,7 @@ class PayrollPeriodService
         // Insert payrolls for employees who haven't received any for this period
         foreach ($employees as $employee) {
             $payrollId = Str::ulid();
-            if (DB::table( 'payrolls')->insert([
+            if (DB::table('payrolls')->insert([
                 'id'                => $payrollId,
                 'employee_id'       => $employee->employee_id,
                 'payroll_period_id' => $payrollPeriod->id,
@@ -199,36 +199,42 @@ class PayrollPeriodService
                 $payroll = DB::table('payrolls')
                     ->where('id', $payrollId)
                     ->first();
-                $totalBonusValue = 0;
-                $totalDeductionValue = 0;
-                foreach ($payrollBonusTypes as $bonusType) {
-                    $bonusvalue = $bonusType->percentage * $employee->salary / 100;
-                    DB::table('payroll_bonuses')->insert([
-                        'id'                   => Str::ulid(),
-                        'payroll_id'          => $payroll->id,
-                        'payroll_bonus_type_id'=> $bonusType->id,
-                        'value'               => $bonusvalue,
-                        'type'                => PayrollBonusTypeEnum::Bonus->value,
-                    ]);
-                    $deductionValue = $bonusType->percentage * $employee->salary / 100;
-                    DB::table('payroll_bonuses')->insert([
-                        'id'                   => Str::ulid(),
-                        'payroll_id'          => $payroll->id,
-                        'payroll_bonus_type_id'=> $bonusType->id,
-                        'value'               => $deductionValue,
-                        'type'                => PayrollBonusTypeEnum::Deduction->value,
-                    ]);
-                    $totalBonusValue += $bonusvalue;
-                    $totalDeductionValue += $deductionValue;
-                }
-                DB::table('payrolls')
-                    ->where('id', $payrollId)
-                    ->update([
-                        'bonus'     => $totalBonusValue,
-                        'deduction' => $totalDeductionValue,
-                        'net_pay'   => $payroll->salary + $totalBonusValue - $totalDeductionValue,
-                    ]);
+                $this->generatePayrollBonusses($payroll, $employee, $payrollBonusTypes);
             }
         }
+    }
+
+    public function generatePayrollBonusses($payroll, $employee, $bonusTypeId, $value)
+    {
+        $totalBonusValue     = 0;
+        $totalDeductionValue = 0;
+        foreach ($payrollBonusTypes as $bonusType) {
+            $bonusvalue = $bonusType->percentage * $employee->salary / 100;
+            DB::table('payroll_bonuses')->insert([
+                'id'                    => Str::ulid(),
+                'payroll_id'            => $payroll->id,
+                'payroll_bonus_type_id' => $bonusType->id,
+                'value'                 => $bonusvalue,
+                'type'                  => PayrollBonusTypeEnum::Bonus->value,
+            ]);
+            $deductionValue = $bonusType->percentage * $employee->salary / 100;
+            DB::table('payroll_bonuses')->insert([
+                'id'                    => Str::ulid(),
+                'payroll_id'            => $payroll->id,
+                'payroll_bonus_type_id' => $bonusType->id,
+                'value'                 => $deductionValue,
+                'type'                  => PayrollBonusTypeEnum::Deduction->value,
+            ]);
+            $totalBonusValue += $bonusvalue;
+            $totalDeductionValue += $deductionValue;
+        }
+        DB::table('payrolls')
+            ->where('id', $payrollId)
+            ->update([
+                'bonus'     => $totalBonusValue,
+                'deduction' => $totalDeductionValue,
+                'net_pay'   => $payroll->salary + $totalBonusValue - $totalDeductionValue,
+            ]);
+
     }
 }
