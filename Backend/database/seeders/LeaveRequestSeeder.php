@@ -1,7 +1,6 @@
 <?php
 namespace Database\Seeders;
 
-use App\Models\Foundation\Employee;
 use App\Models\LeaveType;
 use App\Service\Leave\LeaveRequestService;
 use App\Utils\Enums\LeaveRequestStatus;
@@ -20,7 +19,7 @@ class LeaveRequestSeeder extends Seeder
         // Prepare an array for the past 12 months
         $pastYearMonths = [];
         for ($i = 11; $i >= 0; $i--) {
-            $monthDate        = Carbon::today()->startOfMonth()->subMonth($i);
+            $monthDate        = Carbon::today()->startOfMonth()->subMonth($i + 3);
             $pastYearMonths[] = [
                 'month' => $monthDate->shortMonthName, // e.g. "Jan"
                 'year'  => $monthDate->year,
