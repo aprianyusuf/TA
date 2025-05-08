@@ -44,7 +44,8 @@ class LeaveRequestService
         $query = $query
             ->search($request->search)
             ->filter($request->filter)
-            ->sort($request->sort);
+            ->sort($request->sort)
+            ->orderBy('status', 'asc');
 
         $count = $query->count('id');
 
