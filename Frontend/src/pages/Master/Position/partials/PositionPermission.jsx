@@ -21,7 +21,7 @@ const PositionPermission = ({ organizationPermission = [] }) => {
 	});
 
 	return (
-		<div className="flex w-full flex-col gap-2">
+		<div className="flex flex-col w-full gap-2">
 			<FormLabel className="font-medium">Position Permission</FormLabel>
 			<p className="text-sm font-normal text-red-500 dark:text-red-900">
 				{errors?.permissions?.message ?? errors?.permissions?.root?.message}
@@ -42,50 +42,53 @@ const PositionPermission = ({ organizationPermission = [] }) => {
 
 						return result;
 					}, [])
-					.map((v, i) => (
-						<div key={`${v}-${i}`}>
-							<span>{v.module}</span>
-							<Card className="mt-2">
-								<CardContent className="p-2">
-									<CheckboxControl
-										label={"Select All"}
-										name={v.module}
-										key={v.module}
-										inputChange={(val) => {
-											if (val) {
-												Object.keys(permissions)
-													.filter((p) => v.items.map((s) => s.code).includes(p))
-													.forEach((vl) => {
-														setValue(`permissions.${vl}.value`, true);
-													});
-											} else {
-												Object.keys(permissions)
-													.filter((p) => v.items.map((s) => s.code).includes(p))
-													.forEach((vl) => {
-														setValue(`permissions.${vl}.value`, false);
-													});
-											}
-										}}
-									/>
-									<ScrollArea className="h-64">
-										{Object.keys(permissions)
-											.filter((p) => v.items.map((s) => s.code).includes(p))
-											.map((field) => {
-												return (
-													<div key={field} className="flex gap-2">
-														<CheckboxControl
-															label={permissions[field].name}
-															name={`permissions.${field}.value`}
-															
-														/>
-													</div>
-												);
-											})}
-									</ScrollArea>
-								</CardContent>
-							</Card>
-						</div>
-					))}
+					.map((v, i) => {
+						return (
+							<div key={`${v}-${i}`}>
+								<span>{v.module}</span>
+								<Card className="mt-2">
+									<CardContent className="p-2">
+										<CheckboxControl
+											label={"Select All"}
+											name={v.module}
+											key={v.module}
+											inputChange={(val) => {
+												if (val) {
+													Object.keys(permissions)
+														.filter((p) => v.items.map((s) => s.code).includes(p))
+														.forEach((vl) => {
+															setValue(`permissions.${vl}.value`, true);
+														});
+												} else {
+													Object.keys(permissions)
+														.filter((p) => v.items.map((s) => s.code).includes(p))
+														.forEach((vl) => {
+															setValue(`permissions.${vl}.value`, false);
+														});
+												}
+											}}
+											value={Object.values(permissions).filter(i => i.group === v.module).length === Object.values(permissions).filter(i => i.group === v.module && i.value).length}
+										/>
+										<ScrollArea className="h-64">
+											{Object.keys(permissions)
+												.filter((p) => v.items.map((s) => s.code).includes(p))
+												.map((field) => {
+													return (
+														<div key={field} className="flex gap-2">
+															<CheckboxControl
+																label={permissions[field].name}
+																name={`permissions.${field}.value`}
+
+															/>
+														</div>
+													);
+												})}
+										</ScrollArea>
+									</CardContent>
+								</Card>
+							</div>
+						)
+					})}
 			</div>
 		</div>
 	);
