@@ -121,6 +121,12 @@ export const ROUTE_PAYROLL = [
 		menu: "MD00025",
 		isLazy: true,
 	},
+	{
+		Component: lazy(() => import("@/pages/Payroll/PayrollPeriod/PayrollPreview")),
+		path: "payrollperiod/payrollpreview",
+		menu: "MD00028",
+		isLazy: true,
+	},
 ];
 
 export const ROUTE_PROJECT_MANAGEMENT = [
