@@ -70,7 +70,7 @@ class PayrollService
 
                 $payroll->bonuses = (clone $bonusQuery)
                     ->where('pb.type', PayrollBonusTypeEnum::Bonus->value)
-                    ->select(['pb.id', 'pb.value', 'pbt.name'])
+                    ->select(['pb.id', 'pb.value', 'pbt.name', 'pbt.percentage as percentage'])
                     ->get();
 
                 $payroll->bonus_value = (clone $bonusQuery)
@@ -79,7 +79,7 @@ class PayrollService
 
                 $payroll->deductions = (clone $bonusQuery)
                     ->where('pb.type', PayrollBonusTypeEnum::Deduction->value)
-                    ->select(['pb.id', 'pb.value', 'pbt.name'])
+                    ->select(['pb.id', 'pb.value', 'pbt.name', 'pbt.percentage as percentage'])
                     ->get();
 
                 $payroll->deduction_value = (clone $bonusQuery)
