@@ -45,7 +45,7 @@ class LeaveRequestService
             ->search($request->search)
             ->filter($request->filter)
             ->sort($request->sort)
-            ->orderBy('status', 'asc');
+            ->orderBy('updated_at', 'desc');
 
         $count = $query->count('id');
 
@@ -303,6 +303,7 @@ class LeaveRequestService
                 'status'        => LeaveRequestStatus::Approved,
                 'responded_by'  => $approverId,
                 'responded_at'  => Carbon::now(),
+                'updated_at'    => Carbon::now(),
             ]);
 
             return $leaveRequest;
@@ -316,6 +317,7 @@ class LeaveRequestService
                 'status'        => LeaveRequestStatus::Rejected,
                 'responded_by'  => $approverId,
                 'responded_at'  => Carbon::now(),
+                'updated_at'    => Carbon::now(),
             ]);
 
             return $leaveRequest;
