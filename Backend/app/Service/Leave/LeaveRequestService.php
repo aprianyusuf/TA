@@ -35,9 +35,10 @@ class LeaveRequestService
         if (! in_array($user['position']['name'], ['HR', 'CEO'])) {
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user['id'])
-                    ->orWhereHas('user', function ($subQuery) use ($user) {
-                        $subQuery->where('report_to_id', $user['id']);
-                    });
+                    // ->orWhereHas('user', function ($subQuery) use ($user) {
+                    //     $subQuery->where('report_to_id', $user['id']);
+                    // })
+                    ;
             });
         }
 

@@ -248,12 +248,20 @@ class PayrollPeriodService
             $totalBonusValue += $bonusvalue;
             $totalDeductionValue += $deductionValue;
         }
+        $net_pay = $payroll->salary + $totalBonusValue - $totalDeductionValue;
+        Log::debug('Track generate payroll bonusses function',
+            [
+                'total_bonus_value'    => $totalBonusValue,
+                'total_deduction_value' => $totalDeductionValue,
+                'salary'              => $payroll->salary,
+                'net_pay'             => $net_pay,
+            ]);
         DB::table('payrolls')
             ->where('id', $payroll->id)
             ->update([
                 'bonus'     => $totalBonusValue,
                 'deduction' => $totalDeductionValue,
-                'net_pay'   => $payroll->salary + $totalBonusValue - $totalDeductionValue,
+                'net_pay'   => $net_pay,
             ]);
     }
 }
