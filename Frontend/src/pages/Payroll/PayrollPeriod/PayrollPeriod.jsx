@@ -174,8 +174,8 @@ const PayrollPeriod = () => {
                     </div>
                     <Table
                         columns={columns({
-                            isCanEdit: isUserCan("MD00004"),
-                            isCanDelete: isUserCan("MD00005"),
+                            isCanEdit: isUserCan("MD00023"),
+                            isCanDelete: isUserCan("MD00026"),
                         })}
                         data={data?.data}
                         isLoading={isLoading}

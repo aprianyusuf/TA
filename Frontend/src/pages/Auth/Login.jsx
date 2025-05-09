@@ -37,7 +37,7 @@ const Login = () => {
 
 	useEffect(() => {
 		if (user && token) {
-			navigate("/master/employee", { replace: true });
+			navigate("/leave/leave-request", { replace: true });
 		}
 	}, [user]);
 
